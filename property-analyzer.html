@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script defer src="/_vercel/insights/script.js"></script>
+  <title>Property Investment Analyzer</title>
+  <meta name="description" content="Property Investment Analyzer" />
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: monospace;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      min-width: 100px;
+    }
+
+    button:disabled {
+      background-color: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #1d4ed8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 10px;
+      display: none;
+      padding: 10px;
+      background-color: #fef2f2;
+      border-radius: 4px;
+    }
+
+    .error.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="/">Home</a>
+  <div class="container">
+    <h1>Real Estate Analyzer</h1>
+
+    <div class="input-group">
+      <label for="htmlInput">Paste the property listing HTML below:</label>
+      <textarea id="htmlInput"
+        placeholder="Paste the full HTML content from the property listing page here..."></textarea>
+      <button id="analyzeButton" onclick="analyzeProperty()">Analyze</button>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="loading" class="loading">Analyzing property data...</div>
+
+    <table id="propertyTable">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>List Price</td>
+          <td id="listPrice">-</td>
+        </tr>
+        <tr>
+          <td>Price per Sq Ft</td>
+          <td id="pricePerSqFt">-</td>
+        </tr>
+        <tr>
+          <td>Bedrooms</td>
+          <td id="beds">-</td>
+        </tr>
+        <tr>
+          <td>Bathrooms</td>
+          <td id="baths">-</td>
+        </tr>
+        <tr>
+          <td>Square Footage</td>
+          <td id="sqft">-</td>
+        </tr>
+        <tr>
+          <td>Lot Size</td>
+          <td id="lotSize">-</td>
+        </tr>
+        <tr>
+          <td>Year Built</td>
+          <td id="yearBuilt">-</td>
+        </tr>
+        <tr>
+          <td>Property Type</td>
+          <td id="propertyType">-</td>
+        </tr>
+        <tr>
+          <td>Est. Monthly Mortgage</td>
+          <td id="mortgage">-</td>
+        </tr>
+        <tr>
+          <td>Property Taxes (Annual)</td>
+          <td id="taxes">-</td>
+        </tr>
+        <tr>
+          <td>Insurance (Annual)</td>
+          <td id="insurance">-</td>
+        </tr>
+        <tr>
+          <td>Est. Monthly Cash Flow</td>
+          <td id="cashFlow">-</td>
+        </tr>
+        <tr>
+          <td>Cap Rate</td>
+          <td id="capRate">-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const MORTGAGE_RATE = 0.07; // 7% interest rate
+    const MORTGAGE_TERM = 30; // 30 year mortgage
+    const DOWN_PAYMENT = 0.20; // 20% down payment
+
+    function parseHTML(html) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Initialize data object
+      const propertyData = {
+        listPrice: null,
+        bedrooms: null,
+        bathrooms: null,
+        squareFootage: null,
+        lotSize: null,
+        yearBuilt: null,
+        propertyType: null
+      };
+
+      // Common price patterns
+      const pricePattern = /[\$]?([0-9,]+)/;
+      const numberPattern = /([0-9,]+)/;
+
+      // Extract price - look for common price patterns in the HTML
+      const priceMatches = html.match(/\$([0-9,]+,?[0-9]*)/g);
+      if (priceMatches && priceMatches.length > 0) {
+        const price = priceMatches[0].replace(/[\$,]/g, '');
+        propertyData.listPrice = parseInt(price);
+      }
+
+      // Function to clean and parse numbers
+      const parseNumber = (str) => {
+        if (!str) return null;
+        const matches = str.match(numberPattern);
+        return matches ? parseInt(matches[1].replace(/,/g, '')) : null;
+      };
+
+      // Extract bedrooms
+      const bedPattern = /(\d+)\s*bed/i;
+      const bedMatch = html.match(bedPattern);
+      if (bedMatch) {
+        propertyData.bedrooms = parseInt(bedMatch[1]);
+      }
+
+      // Extract bathrooms
+      const bathPattern = /(\d+(?:\.\d+)?)\s*bath/i;
+      const bathMatch = html.match(bathPattern);
+      if (bathMatch) {
+        propertyData.bathrooms = parseFloat(bathMatch[1]);
+      }
+
+      // Extract square footage
+      const sqftPattern = /(\d+(?:,\d+)?)\s*sq\s*ft/i;
+      const sqftMatch = html.match(sqftPattern);
+      if (sqftMatch) {
+        propertyData.squareFootage = parseNumber(sqftMatch[1]);
+      }
+
+      // New Zillow-specific patterns
+      // Extract lot size - look for text containing "Acres lot"
+      const lotSizeText = html.match(/(\d+(?:\.\d+)?)\s*Acres?\s*lot/i);
+      if (lotSizeText) {
+        propertyData.lotSize = lotSizeText[1] + " acres";
+      } else {
+        // Try alternative pattern for square feet lot size
+        const lotSqFtText = html.match(/(\d+(?:,\d+)?)\s*sq\s*ft\s*lot/i);
+        if (lotSqFtText) {
+          propertyData.lotSize = lotSqFtText[1].replace(/,/g, '') + " sq ft";
+        }
+      }
+
+      // Extract year built - look for "Built in YYYY"
+      const yearBuiltText = html.match(/Built\s*in\s*(\d{4})/i);
+      if (yearBuiltText) {
+        propertyData.yearBuilt = parseInt(yearBuiltText[1]);
+      }
+
+      // Extract property type - look for specific property type text
+      const propertyTypeText = html.match(/Single Family Residence|Condo|Townhouse|Multi-Family|Apartment/i);
+      if (propertyTypeText) {
+        propertyData.propertyType = propertyTypeText[0];
+      }
+
+      // Parse price per sqft if available
+      const pricePerSqFtMatch = html.match(/\$(\d+)\/sqft/);
+      if (pricePerSqFtMatch && propertyData.squareFootage) {
+        const pricePerSqFt = parseInt(pricePerSqFtMatch[1]);
+        // If we don't have a list price but we have price per sqft, we can calculate it
+        if (!propertyData.listPrice && propertyData.squareFootage) {
+          propertyData.listPrice = pricePerSqFt * propertyData.squareFootage;
+        }
+      }
+
+      return propertyData;
+    }
+
+    function calculateMetrics(propertyData) {
+      const metrics = {};
+
+      if (propertyData.listPrice && propertyData.squareFootage) {
+        metrics.pricePerSqFt = propertyData.listPrice / propertyData.squareFootage;
+      }
+
+      // Calculate mortgage payment
+      if (propertyData.listPrice) {
+        const loanAmount = propertyData.listPrice * (1 - DOWN_PAYMENT);
+        const monthlyRate = MORTGAGE_RATE / 12;
+        const numPayments = MORTGAGE_TERM * 12;
+        metrics.mortgage = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+          (Math.pow(1 + monthlyRate, numPayments) - 1);
+      }
+
+      // Estimate property taxes (using 1% as default rate)
+      if (propertyData.listPrice) {
+        metrics.taxes = propertyData.listPrice * 0.01;
+      }
+
+      // Estimate insurance (using 0.3% of property value)
+      if (propertyData.listPrice) {
+        metrics.insurance = propertyData.listPrice * 0.003;
+      }
+
+      return metrics;
+    }
+
+    async function analyzeProperty() {
+      const button = document.getElementById('analyzeButton');
+      const error = document.getElementById('error');
+      const loading = document.getElementById('loading');
+      const htmlInput = document.getElementById('htmlInput').value;
+
+      if (!htmlInput.trim()) {
+        showError('Please paste the property listing HTML');
+        return;
+      }
+
+      // Reset UI state
+      error.classList.remove('active');
+      loading.classList.add('active');
+      button.disabled = true;
+      resetTable();
+
+      try {
+        // Parse the HTML
+        const propertyData = parseHTML(htmlInput);
+
+        // Calculate additional metrics
+        const metrics = calculateMetrics(propertyData);
+
+        // Update the table
+        updateTable(propertyData, metrics);
+
+      } catch (err) {
+        showError(err.message || 'Failed to analyze property');
+      } finally {
+        loading.classList.remove('active');
+        button.disabled = false;
+      }
+    }
+
+    function updateTable(propertyData, metrics) {
+      // Update property data
+      updateCell('listPrice', propertyData.listPrice, formatCurrency);
+      updateCell('beds', propertyData.bedrooms);
+      updateCell('baths', propertyData.bathrooms);
+      updateCell('sqft', propertyData.squareFootage, formatNumber);
+      updateCell('lotSize', propertyData.lotSize);
+      updateCell('yearBuilt', propertyData.yearBuilt);
+      updateCell('propertyType', propertyData.propertyType);
+
+      // Update calculated metrics
+      updateCell('pricePerSqFt', metrics.pricePerSqFt, formatCurrency);
+      updateCell('mortgage', metrics.mortgage, formatCurrency);
+      updateCell('taxes', metrics.taxes, formatCurrency);
+      updateCell('insurance', metrics.insurance, formatCurrency);
+    }
+
+    function updateCell(id, value, formatter = (v) => v) {
+      const cell = document.getElementById(id);
+      if (cell) {
+        cell.textContent = value != null ? formatter(value) : '-';
+      }
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(value);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat('en-US').format(value);
+    }
+
+    function resetTable() {
+      const cells = document.querySelectorAll('td:nth-child(2)');
+      cells.forEach(cell => cell.textContent = '-');
+    }
+
+    function showError(message) {
+      const error = document.getElementById('error');
+      error.textContent = message;
+      error.classList.add('active');
+    }
+  </script>
+</body>
+
+</html>
