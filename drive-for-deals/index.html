@@ -6,10 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drive for Deals</title>
-    <meta name="description" content="Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings." />
+    <meta name="description"
+        content="Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings." />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a90e2">
     <style>
         /* Previous styles remain the same */
         .property-item {
@@ -263,6 +267,21 @@
             margin-bottom: 8px;
             font-size: 0.9rem;
         }
+
+        .add-to-home-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .add-to-home-btn:hover {
+            background: #357abd;
+        }
     </style>
 </head>
 <!-- Previous body opening remains the same -->
@@ -272,7 +291,11 @@
         <div class="header">
             <a href="/">Home</a>
             <h1>Drive for Deals</h1>
-            <p>Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings.</p>
+            <p>Map and track potential investment properties while you drive. Pin locations, add notes, and export your
+                findings.</p>
+            <button id="addToHomeScreen" class="add-to-home-btn">
+                Add to Home Screen
+            </button>
         </div>
 
         <div class="content">
@@ -338,6 +361,31 @@
         let properties = [];
         let markers = [];
         let currentPosition = null;
+        let deferredPrompt;
+
+        // The 2 event listeners below are for installing the app as a shortcut on a mobile device
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI notify the user they can add to home screen
+            document.getElementById('addToHomeScreen').style.display = 'block';
+        });
+
+        document.getElementById('addToHomeScreen').addEventListener('click', () => {
+            // Show the prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
 
         // Modified loadProperties function to store marker references
         // Update the loadProperties function to include coordinates in popup
