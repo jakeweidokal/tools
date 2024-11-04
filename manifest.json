@@ -1,7 +1,7 @@
 {
     "name": "Drive for Deals",
     "short_name": "D4D",
-    "start_url": "/",
+    "start_url": "/drive-for-deals",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#4a90e2",

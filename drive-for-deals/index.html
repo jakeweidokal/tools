@@ -590,12 +590,28 @@
                         startLocationTracking();
                         break;
                     case 'prompt':
-                        // Show custom message before requesting permission
-                        if (confirm('This app would like to use your location to allow you to place pins. Would you like to allow location access?')) {
-                            requestLocationWithFallback();
-                        } else {
-                            handleLocationError('Location access denied by user');
-                        }
+                        // Customize the default browser prompt
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                updateCurrentPosition(position);
+                                startLocationTracking();
+                            },
+                            (error) => handleLocationError(error.message),
+                            {
+                                // Customize the prompt options
+                                maximumAge: 0,
+                                timeout: Infinity,
+                                enableHighAccuracy: true,
+                                // Add a message to the prompt
+                                // This message will be displayed alongside the browser's default prompt text
+                                // The actual text of the prompt is still controlled by the browser
+                                providerShortName: 'Drive for Deals',
+                                // Optionally, you can also set the position accuracy requirement
+                                positionOptions: {
+                                    accuracy: navigator.geolocation.PositionOptions.ACCURACY_HIGH
+                                }
+                            }
+                        );
                         break;
                     case 'denied':
                         handleLocationError('Location access is blocked. Please enable location access in your browser settings to use this feature.');
@@ -614,6 +630,7 @@
                 requestLocationWithFallback();
             }
         }
+
         function requestLocationWithFallback() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -639,9 +656,10 @@
                 updateCurrentPosition,
                 (error) => handleLocationError(error.message),
                 {
-                    enableHighAccuracy: true,
-                    maximumAge: 30000, // Cache location for 30 seconds
-                    timeout: 27000 // Timeout after 27 seconds
+                    // Customize the prompt text
+                    maximumAge: 30000,
+                    timeout: Infinity, // Set the timeout to infinity
+                    enableHighAccuracy: true
                 }
             );
         }
