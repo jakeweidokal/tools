@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Previous head content remains the same until style updates -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive for Deals</title>
+    <meta name="description" content="Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings." />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+    <style>
+        /* Previous styles remain the same */
+        .property-item {
+            background: #f8fafc;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: auto;
+        }
+
+        .delete-button:hover {
+            background: #c53030;
+        }
+
+        .property-content {
+            padding-right: 60px;
+            /* Make room for delete button */
+        }
+
+        /* Include all previous styles for completeness */
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .header {
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        h1 {
+            margin: 0;
+            color: #1a1a1a;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .content {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-section {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            z-index: 1;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .form-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 15px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+            max-height: 45vh;
+            overflow-y: auto;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quick-actions button {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 80px;
+            resize: none;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        button:active {
+            background: #357abd;
+            transform: scale(0.98);
+        }
+
+        .property-list {
+            margin-top: 15px;
+            max-height: 30vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .success-message {
+            background: #48bb78;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: none;
+            text-align: center;
+        }
+
+        .current-location {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .export-button {
+            background: #38a169;
+            margin-top: 10px;
+        }
+
+        .clear-button {
+            background: #e53e3e;
+            margin-top: 10px;
+        }
+
+        .property-count {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            padding: 5px;
+            background: #f0f2f5;
+            border-radius: 4px;
+        }
+
+        .edit-mode {
+            background: #fff !important;
+        }
+
+        .edit-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .edit-buttons button {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .save-button {
+            background: #38a169 !important;
+        }
+
+        .cancel-button {
+            background: #718096 !important;
+        }
+
+        .edit-button {
+            position: absolute;
+            top: 8px;
+            right: 40px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .edit-button:hover {
+            background: #357abd;
+        }
+
+        .property-edit-form {
+            margin-top: 8px;
+        }
+
+        .property-edit-form input,
+        .property-edit-form textarea {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<!-- Previous body opening remains the same -->
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/">Home</a>
+            <h1>Drive for Deals</h1>
+            <p>Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings.</p>
+        </div>
+
+        <div class="content">
+            <div class="map-section">
+                <div id="map"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="current-location" id="currentLocation">
+                    Getting location...
+                </div>
+
+                <div class="success-message" id="successMessage">
+                    Location pinned successfully!
+                </div>
+
+                <div class="property-count" id="propertyCount">
+                    Loading properties...
+                </div>
+
+                <div class="quick-actions">
+                    <button id="pinCurrentLocation" type="button">
+                        📍 Pin Current Location
+                    </button>
+                </div>
+
+                <form id="propertyForm">
+                    <div class="form-group">
+                        <label for="address">Address (optional)</label>
+                        <input type="text" id="address" placeholder="Enter property address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" placeholder="Add any property notes here"></textarea>
+                    </div>
+
+                    <button type="submit">Save Property</button>
+                </form>
+
+                <button id="exportProperties" class="export-button">
+                    📥 Export Properties (CSV)
+                </button>
+
+                <button id="clearProperties" class="clear-button">
+                    🗑️ Clear All Properties
+                </button>
+
+                <div class="property-list" id="propertyList">
+                    <!-- Properties will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Previous initialization code remains the same
+        const map = L.map('map').setView([0, 0], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let properties = [];
+        let markers = [];
+        let currentPosition = null;
+
+        // Modified loadProperties function to store marker references
+        // Update the loadProperties function to include coordinates in popup
+        function loadProperties() {
+            const savedProperties = localStorage.getItem('drivingProperties');
+            if (savedProperties) {
+                properties = JSON.parse(savedProperties);
+                properties.forEach(property => {
+                    const marker = L.marker([property.location.lat, property.location.lng])
+                        .bindPopup(`
+                    <strong>${property.address}</strong><br>
+                    ${property.notes ? `Notes: ${property.notes}<br>` : ''}
+                    Coordinates: <a href="https://www.google.com/maps?q=${property.location.lat},${property.location.lng}" 
+                    target="_blank">${property.location.lat.toFixed(6)}, ${property.location.lng.toFixed(6)}</a><br>
+                    Added: ${property.timestamp}
+                `)
+                        .addTo(map);
+                    markers[property.id] = marker;
+                });
+                updatePropertyList();
+                updatePropertyCount();
+            }
+        }
+
+        // Update the deleteProperty function to include confirmation
+        function deleteProperty(id) {
+            const property = properties.find(p => p.id === id);
+
+            // Show confirmation dialog with property details
+            const confirmMessage = `Are you sure you want to delete this property?\n\nAddress: ${property.address}${property.notes ? '\nNotes: ' + property.notes : ''}`;
+
+            if (confirm(confirmMessage)) {
+                // Remove marker from map
+                if (markers[id]) {
+                    map.removeLayer(markers[id]);
+                    delete markers[id];
+                }
+
+                // Remove property from array
+                properties = properties.filter(p => p.id !== id);
+
+                // Update localStorage
+                saveProperties();
+
+                // Update display
+                updatePropertyList();
+
+                // Show success message
+                const successMessage = document.getElementById('successMessage');
+                successMessage.innerHTML = 'Property deleted successfully!';
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Previous utility functions remain the same
+        function saveProperties() {
+            localStorage.setItem('drivingProperties', JSON.stringify(properties));
+            updatePropertyCount();
+        }
+
+        function updatePropertyCount() {
+            const count = properties.length;
+            document.getElementById('propertyCount').innerHTML =
+                `📊 Total Properties: ${count}`;
+        }
+
+        // Add these new functions for property editing
+        function editProperty(id) {
+            const propertyDiv = document.querySelector(`[data-property-id="${id}"]`);
+            const property = properties.find(p => p.id === id);
+
+            propertyDiv.classList.add('edit-mode');
+            propertyDiv.innerHTML = `
+        <div class="property-content">
+            <div class="property-edit-form">
+                <label for="edit-address-${id}">Address</label>
+                <input 
+                    type="text" 
+                    id="edit-address-${id}" 
+                    value="${property.address}"
+                    placeholder="Enter property address"
+                >
+                
+                <label for="edit-notes-${id}">Notes</label>
+                <textarea 
+                    id="edit-notes-${id}" 
+                    placeholder="Add any property notes here"
+                >${property.notes || ''}</textarea>
+            </div>
+            
+            <div>
+                Coordinates: <a href="https://www.google.com/maps?q=${property.location.lat},${property.location.lng}" 
+                target="_blank">${property.location.lat.toFixed(6)}, ${property.location.lng.toFixed(6)}</a>
+            </div>
+            <div>Added: ${property.timestamp}</div>
+            
+            <div class="edit-buttons">
+                <button onclick="savePropertyEdit(${id})" class="save-button">Save Changes</button>
+                <button onclick="cancelPropertyEdit(${id})" class="cancel-button">Cancel</button>
+            </div>
+        </div>
+    `;
+        }
+
+        function savePropertyEdit(id) {
+            const property = properties.find(p => p.id === id);
+            const newAddress = document.getElementById(`edit-address-${id}`).value;
+            const newNotes = document.getElementById(`edit-notes-${id}`).value;
+
+            // Update property in array
+            property.address = newAddress || property.address;
+            property.notes = newNotes;
+            property.lastEdited = new Date().toLocaleString();
+
+            // Update marker popup
+            if (markers[id]) {
+                markers[id].setPopupContent(`
+            <strong>${property.address}</strong><br>
+            ${property.notes ? `Notes: ${property.notes}<br>` : ''}
+            Coordinates: <a href="https://www.google.com/maps?q=${property.location.lat},${property.location.lng}" 
+            target="_blank">${property.location.lat.toFixed(6)}, ${property.location.lng.toFixed(6)}</a><br>
+            Added: ${property.timestamp}
+            ${property.lastEdited ? `<br>Last edited: ${property.lastEdited}` : ''}
+        `);
+            }
+
+            // Save to localStorage and update display
+            saveProperties();
+            updatePropertyList();
+
+            // Show success message
+            const successMessage = document.getElementById('successMessage');
+            successMessage.innerHTML = 'Property updated successfully!';
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000);
+        }
+
+        function cancelPropertyEdit(id) {
+            updatePropertyList();
+        }
+
+        // Update the exportPropertiesCSV function to include formatted coordinates
+        // Update the exportPropertiesCSV function to include edit timestamp
+        function exportPropertiesCSV() {
+            const csvContent = [
+                ['Address', 'Notes', 'Coordinates', 'Latitude', 'Longitude', 'Added', 'Last Edited'].join(','),
+                ...properties.map(p => [
+                    `"${p.address}"`,
+                    `"${p.notes}"`,
+                    `"${p.location.lat.toFixed(6)}, ${p.location.lng.toFixed(6)}"`,
+                    p.location.lat,
+                    p.location.lng,
+                    p.timestamp,
+                    p.lastEdited || ''
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `driving-properties-${new Date().toISOString().split('T')[0]}.csv`);
+            a.click();
+        }
+
+        // The clear all properties function already has confirmation, but let's make the message more consistent
+        function clearProperties() {
+            if (confirm('Are you sure you want to delete ALL properties? This cannot be undone.\n\nTotal properties to be deleted: ' + properties.length)) {
+                properties = [];
+                Object.values(markers).forEach(marker => map.removeLayer(marker));
+                markers = {};
+                localStorage.removeItem('drivingProperties');
+                updatePropertyList();
+                updatePropertyCount();
+
+                // Add success message for consistency
+                const successMessage = document.getElementById('successMessage');
+                successMessage.innerHTML = 'All properties deleted successfully!';
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        async function checkLocationPermission() {
+            try {
+                // Check if the Permissions API is supported
+                if (!navigator.permissions || !navigator.permissions.query) {
+                    return requestLocationWithFallback();
+                }
+
+                const permission = await navigator.permissions.query({ name: 'geolocation' });
+
+                switch (permission.state) {
+                    case 'granted':
+                        startLocationTracking();
+                        break;
+                    case 'prompt':
+                        // Show custom message before requesting permission
+                        if (confirm('This app would like to use your location to allow you to place pins. Would you like to allow location access?')) {
+                            requestLocationWithFallback();
+                        } else {
+                            handleLocationError('Location access denied by user');
+                        }
+                        break;
+                    case 'denied':
+                        handleLocationError('Location access is blocked. Please enable location access in your browser settings to use this feature.');
+                        break;
+                }
+
+                // Listen for permission changes
+                permission.addEventListener('change', (e) => {
+                    if (e.target.state === 'granted') {
+                        startLocationTracking();
+                    } else {
+                        handleLocationError(`Location access ${e.target.state}`);
+                    }
+                });
+            } catch (error) {
+                requestLocationWithFallback();
+            }
+        }
+        function requestLocationWithFallback() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updateCurrentPosition(position);
+                        startLocationTracking();
+                    },
+                    (error) => handleLocationError(error.message)
+                );
+            } else {
+                handleLocationError('Geolocation is not supported by this browser');
+            }
+        }
+
+        function startLocationTracking() {
+            // Clear any existing watch
+            if (window.locationWatchId) {
+                navigator.geolocation.clearWatch(window.locationWatchId);
+            }
+
+            // Start watching location with high accuracy
+            window.locationWatchId = navigator.geolocation.watchPosition(
+                updateCurrentPosition,
+                (error) => handleLocationError(error.message),
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 30000, // Cache location for 30 seconds
+                    timeout: 27000 // Timeout after 27 seconds
+                }
+            );
+        }
+
+        function updateCurrentPosition(position) {
+            const { latitude, longitude } = position.coords;
+            currentPosition = { lat: latitude, lng: longitude };
+            document.getElementById('currentLocation').innerHTML =
+                `📍 Current Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+            map.setView([latitude, longitude], 16);
+        }
+
+        function handleLocationError(message) {
+            document.getElementById('currentLocation').innerHTML =
+                `⚠️ ${message}`;
+            document.getElementById('pinCurrentLocation').disabled = true;
+        }
+
+        // Initialize location handling once when the page loads
+        checkLocationPermission();
+
+        // Modified addProperty function to store marker reference
+        // Modify the addProperty function to include formatted coordinates
+        function addProperty(property) {
+            properties.push(property);
+
+            const marker = L.marker([property.location.lat, property.location.lng])
+                .bindPopup(`
+            <strong>${property.address}</strong><br>
+            ${property.notes ? `Notes: ${property.notes}<br>` : ''}
+            Coordinates: <a href="https://www.google.com/maps?q=${property.location.lat},${property.location.lng}" 
+            target="_blank">${property.location.lat.toFixed(6)}, ${property.location.lng.toFixed(6)}</a><br>
+            Added: ${property.timestamp}
+        `)
+                .addTo(map);
+
+            markers[property.id] = marker;
+            updatePropertyList();
+            saveProperties();
+        }
+
+        // Modified updatePropertyList to include delete buttons
+        // Update the updatePropertyList function to include clickable coordinates
+        // Update the updatePropertyList function to include edit button and tracking of edits
+        function updatePropertyList() {
+            const list = document.getElementById('propertyList');
+            list.innerHTML = properties.map(property => `
+        <div class="property-item" data-property-id="${property.id}">
+            <div class="property-content">
+                <strong>${property.address}</strong><br>
+                ${property.notes ? `Notes: ${property.notes}<br>` : ''}
+                Coordinates: <a href="https://www.google.com/maps?q=${property.location.lat},${property.location.lng}" 
+                target="_blank">${property.location.lat.toFixed(6)}, ${property.location.lng.toFixed(6)}</a><br>
+                Added: ${property.timestamp}
+                ${property.lastEdited ? `<br>Last edited: ${property.lastEdited}` : ''}
+            </div>
+            <button class="edit-button" onclick="editProperty(${property.id})">
+                ✎
+            </button>
+            <button class="delete-button" onclick="deleteProperty(${property.id})">
+                🗑️
+            </button>
+        </div>
+    `).join('');
+        }
+
+        // Previous event listeners remain the same
+        document.getElementById('pinCurrentLocation').addEventListener('click', () => {
+            if (currentPosition) {
+                const property = {
+                    id: Date.now(),
+                    address: document.getElementById('address').value || 'Location pinned',
+                    notes: document.getElementById('notes').value,
+                    timestamp: new Date().toLocaleString(),
+                    location: currentPosition
+                };
+
+                addProperty(property);
+
+                const successMessage = document.getElementById('successMessage');
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+
+                document.getElementById('propertyForm').reset();
+            }
+        });
+
+        document.getElementById('propertyForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (currentPosition) {
+                const property = {
+                    id: Date.now(),
+                    address: document.getElementById('address').value || 'Location pinned',
+                    notes: document.getElementById('notes').value,
+                    timestamp: new Date().toLocaleString(),
+                    location: currentPosition
+                };
+
+                addProperty(property);
+                e.target.reset();
+            }
+        });
+
+        document.getElementById('exportProperties').addEventListener('click', exportPropertiesCSV);
+        document.getElementById('clearProperties').addEventListener('click', clearProperties);
+
+        // Load saved properties on startup
+        loadProperties();
+    </script>
+</body>
+
+</html>
