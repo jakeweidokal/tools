@@ -117,12 +117,11 @@
 
         .quick-actions {
             display: flex;
-            gap: 10px;
+            justify-content: center;
             margin-bottom: 15px;
         }
 
         .quick-actions button {
-            flex: 1;
             padding: 12px;
             font-size: 0.9rem;
         }
@@ -282,6 +281,90 @@
         .add-to-home-btn:hover {
             background: #357abd;
         }
+
+        .pin-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .pin-button:hover {
+            background: #357abd;
+            transform: scale(1.05);
+        }
+
+        .pin-button:active {
+            background: #357abd;
+            transform: scale(0.95);
+        }
+
+        .pin-button .icon {
+            font-size: 2rem;
+        }
+
+        /* Update the map controls styles to ensure visibility */
+        .map-controls {
+            position: fixed;
+            /* Changed from absolute to fixed */
+            top: 120px;
+            /* Adjusted to be below the header */
+            right: 10px;
+            z-index: 1001;
+            /* Increased z-index to ensure it's above all map elements */
+            pointer-events: auto;
+        }
+
+        .center-toggle {
+            background: white;
+            color: #4a90e2;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            min-width: 120px;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .center-toggle.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .center-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        .car-icon {
+            animation: bounce 1s infinite;
+            transform-origin: center;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
     </style>
 </head>
 <!-- Previous body opening remains the same -->
@@ -291,8 +374,6 @@
         <div class="header">
             <a href="/">Home</a>
             <h1>Drive for Deals</h1>
-            <p>Map and track potential investment properties while you drive. Pin locations, add notes, and export your
-                findings.</p>
             <button id="addToHomeScreen" class="add-to-home-btn">
                 Add to Home Screen
             </button>
@@ -302,7 +383,11 @@
             <div class="map-section">
                 <div id="map"></div>
             </div>
-
+            <div class="map-controls">
+                <button id="centerToggle" class="center-toggle active">
+                    🎯 Auto-Center Map
+                </button>
+            </div>
             <div class="form-section">
                 <div class="current-location" id="currentLocation">
                     Getting location...
@@ -317,8 +402,8 @@
                 </div>
 
                 <div class="quick-actions">
-                    <button id="pinCurrentLocation" type="button">
-                        📍 Pin Current Location
+                    <button id="pinCurrentLocation" type="button" class="pin-button">
+                        <span class="icon">📍</span>
                     </button>
                 </div>
 
@@ -362,6 +447,19 @@
         let markers = [];
         let currentPosition = null;
         let deferredPrompt;
+        let currentLocationMarker = null;
+        let autoCenterEnabled = true;
+
+        // Create a custom car icon
+        const carIcon = L.divIcon({
+            html: `
+                <svg class="car-icon" width="24" height="24" viewBox="0 0 24 24" fill="#4a90e2">
+                    <path d="M5,11L6.5,6.5H17.5L19,11M17.5,16A1.5,1.5 0 0,1 16,14.5A1.5,1.5 0 0,1 17.5,13A1.5,1.5 0 0,1 19,14.5A1.5,1.5 0 0,1 17.5,16M6.5,16A1.5,1.5 0 0,1 5,14.5A1.5,1.5 0 0,1 6.5,13A1.5,1.5 0 0,1 8,14.5A1.5,1.5 0 0,1 6.5,16M18.92,6C18.72,5.42 18.16,5 17.5,5H6.5C5.84,5 5.28,5.42 5.08,6L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6Z" />
+                </svg>`,
+            className: '',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
 
         // The 2 event listeners below are for installing the app as a shortcut on a mobile device
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -664,18 +762,45 @@
             );
         }
 
+        // Update the updateCurrentPosition function
         function updateCurrentPosition(position) {
             const { latitude, longitude } = position.coords;
             currentPosition = { lat: latitude, lng: longitude };
+
             document.getElementById('currentLocation').innerHTML =
                 `📍 Current Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-            map.setView([latitude, longitude], 16);
+
+            // Update or create the car marker
+            if (currentLocationMarker) {
+                currentLocationMarker.setLatLng([latitude, longitude]);
+            } else {
+                currentLocationMarker = L.marker([latitude, longitude], { icon: carIcon }).addTo(map);
+            }
+
+            // Only center the map if auto-center is enabled
+            if (autoCenterEnabled) {
+                map.setView([latitude, longitude], 16);
+            }
         }
 
+        // Add map interaction handler to disable auto-center when user interacts
+        map.on('dragstart', function () {
+            if (autoCenterEnabled) {
+                autoCenterEnabled = false;
+                document.getElementById('centerToggle').classList.remove('active');
+            }
+        });
+
+        // Update the handleLocationError function
         function handleLocationError(message) {
-            document.getElementById('currentLocation').innerHTML =
-                `⚠️ ${message}`;
+            document.getElementById('currentLocation').innerHTML = `⚠️ ${message}`;
             document.getElementById('pinCurrentLocation').disabled = true;
+
+            // Remove the car marker if it exists
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+                currentLocationMarker = null;
+            }
         }
 
         // Initialize location handling once when the page loads
@@ -771,6 +896,27 @@
 
         // Load saved properties on startup
         loadProperties();
+
+        // Add this after map initialization to ensure the button works
+        document.addEventListener('DOMContentLoaded', function () {
+            const centerToggle = document.getElementById('centerToggle');
+
+            // Set initial state
+            centerToggle.classList.add('active');
+
+            centerToggle.addEventListener('click', function () {
+                autoCenterEnabled = !autoCenterEnabled;
+                this.classList.toggle('active');
+
+                // If enabling auto-center, immediately center on current location
+                if (autoCenterEnabled && currentPosition) {
+                    map.setView([currentPosition.lat, currentPosition.lng], 16);
+                }
+
+                // Log state for debugging
+                console.log('Auto-center:', autoCenterEnabled);
+            });
+        });
     </script>
 </body>
 
