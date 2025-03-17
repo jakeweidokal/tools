@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Viewer and Navigator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .upload-container {
+      flex: 1;
+    }
+
+    .upload-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .file-input {
+      display: block;
+      width: 100%;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 5px;
+      margin-left: 5px;
+      border-left: 1px solid #ddd;
+      padding-left: 5px;
+    }
+
+    .button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      position: relative;
+    }
+
+    .button-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .button-primary:hover {
+      background-color: #2563eb;
+    }
+
+    .button-secondary {
+      background-color: #6b7280;
+      color: white;
+    }
+
+    .button-secondary:hover {
+      background-color: #4b5563;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      z-index: 10;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      pointer-events: none;
+    }
+
+    .button:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .viewer-container {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9fafb;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+
+    .placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #6b7280;
+    }
+
+    .svg-viewer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      overflow: hidden;
+    }
+
+    .svg-viewer.dragging {
+      cursor: grabbing;
+    }
+
+    .svg-content {
+      position: absolute;
+      transform-origin: center center;
+      transition: transform 0.075s;
+    }
+
+    .info {
+      font-size: 0.8rem;
+      color: #4b5563;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .hotkeys {
+      font-size: 0.8rem;
+    }
+
+    .hotkeys kbd {
+      background-color: #eee;
+      border-radius: 3px;
+      border: 1px solid #b4b4b4;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+      color: #333;
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: bold;
+      line-height: 1;
+      padding: 2px 4px;
+      margin: 0 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-controls">
+    <h1>SVG Viewer</h1>
+
+    <div class="upload-container">
+      <label class="upload-label" for="svg-upload">Upload SVG</label>
+      <input type="file" id="svg-upload" accept=".svg" class="file-input">
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <button id="zoom-in" class="button button-primary">
+          Zoom In
+          <span class="tooltip">Hotkey: + or =</span>
+        </button>
+        <button id="zoom-out" class="button button-primary">
+          Zoom Out
+          <span class="tooltip">Hotkey: -</span>
+        </button>
+      </div>
+
+      <div class="control-group">
+        <button id="pan-up" class="button button-secondary">
+          ↑
+          <span class="tooltip">Hotkey: Arrow Up</span>
+        </button>
+        <button id="pan-down" class="button button-secondary">
+          ↓
+          <span class="tooltip">Hotkey: Arrow Down</span>
+        </button>
+        <button id="pan-left" class="button button-secondary">
+          ←
+          <span class="tooltip">Hotkey: Arrow Left</span>
+        </button>
+        <button id="pan-right" class="button button-secondary">
+          →
+          <span class="tooltip">Hotkey: Arrow Right</span>
+        </button>
+      </div>
+
+      <div class="control-group">
+        <button id="reset-view" class="button button-secondary">
+          Reset
+          <span class="tooltip">Hotkey: R</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="viewer-container" id="viewer-container">
+    <div class="placeholder" id="placeholder">
+      <p>Upload an SVG to view it here</p>
+    </div>
+    <div class="svg-viewer" id="svg-viewer" style="display: none;">
+      <div class="svg-content" id="svg-content"></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div>
+      <strong>Zoom:</strong> <span id="zoom-level">100%</span>
+    </div>
+    <div class="hotkeys">
+      <strong>Hotkeys:</strong>
+      <kbd>+/-</kbd> Zoom,
+      <kbd>↑↓←→</kbd> Pan,
+      <kbd>R</kbd> Reset,
+      <kbd>Spacebar</kbd> + drag to pan
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // DOM elements
+      const fileInput = document.getElementById('svg-upload');
+      const zoomInBtn = document.getElementById('zoom-in');
+      const zoomOutBtn = document.getElementById('zoom-out');
+      const panUpBtn = document.getElementById('pan-up');
+      const panDownBtn = document.getElementById('pan-down');
+      const panLeftBtn = document.getElementById('pan-left');
+      const panRightBtn = document.getElementById('pan-right');
+      const resetBtn = document.getElementById('reset-view');
+      const placeholder = document.getElementById('placeholder');
+      const svgViewer = document.getElementById('svg-viewer');
+      const svgContent = document.getElementById('svg-content');
+      const zoomLevelDisplay = document.getElementById('zoom-level');
+
+      // State variables
+      let scale = 1;
+      let position = { x: 0, y: 0 };
+      let isDragging = false;
+      let dragStart = { x: 0, y: 0 };
+      const PAN_STEP = 40;
+
+      // File upload handler
+      fileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          svgContent.innerHTML = e.target.result;
+          placeholder.style.display = 'none';
+          svgViewer.style.display = 'block';
+
+          // Reset view
+          resetView();
+        };
+        reader.readAsText(file);
+      });
+
+      // Zoom functions
+      function zoomIn() {
+        scale = Math.min(scale * 1.2, 10);
+        updateTransform();
+      }
+
+      function zoomOut() {
+        scale = Math.max(scale / 1.2, 0.1);
+        updateTransform();
+      }
+
+      function updateZoomDisplay() {
+        zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
+      }
+
+      function updateTransform() {
+        svgContent.style.transform = `translate(${position.x}px, ${position.y}px) scale(${scale})`;
+        updateZoomDisplay();
+      }
+
+      zoomInBtn.addEventListener('click', zoomIn);
+      zoomOutBtn.addEventListener('click', zoomOut);
+
+      // Pan functions
+      function panUp() {
+        position.y += PAN_STEP;
+        updateTransform();
+      }
+
+      function panDown() {
+        position.y -= PAN_STEP;
+        updateTransform();
+      }
+
+      function panLeft() {
+        position.x += PAN_STEP;
+        updateTransform();
+      }
+
+      function panRight() {
+        position.x -= PAN_STEP;
+        updateTransform();
+      }
+
+      panUpBtn.addEventListener('click', panUp);
+      panDownBtn.addEventListener('click', panDown);
+      panLeftBtn.addEventListener('click', panLeft);
+      panRightBtn.addEventListener('click', panRight);
+
+      function resetView() {
+        scale = 1;
+        position = { x: 0, y: 0 };
+        updateTransform();
+      }
+
+      resetBtn.addEventListener('click', resetView);
+
+      // Drag handlers
+      svgViewer.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return; // Only left mouse button
+        isDragging = true;
+        svgViewer.classList.add('dragging');
+        dragStart = {
+          x: e.clientX - position.x,
+          y: e.clientY - position.y
+        };
+      });
+
+      document.addEventListener('mousemove', function (e) {
+        if (!isDragging) return;
+        position = {
+          x: e.clientX - dragStart.x,
+          y: e.clientY - dragStart.y
+        };
+        updateTransform();
+      });
+
+      document.addEventListener('mouseup', function () {
+        isDragging = false;
+        svgViewer.classList.remove('dragging');
+      });
+
+      // Wheel zoom
+      svgViewer.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        scale = Math.max(0.1, Math.min(10, scale * delta));
+        updateTransform();
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', function (e) {
+        // Only process keyboard shortcuts if an SVG is loaded
+        if (svgViewer.style.display === 'none') return;
+
+        // Don't process keyboard shortcuts if user is typing in an input field
+        if (document.activeElement.tagName === 'INPUT') return;
+
+        switch (e.key) {
+          case '+':
+          case '=':
+            zoomIn();
+            break;
+          case '-':
+            zoomOut();
+            break;
+          case 'ArrowUp':
+            panUp();
+            e.preventDefault();
+            break;
+          case 'ArrowDown':
+            panDown();
+            e.preventDefault();
+            break;
+          case 'ArrowLeft':
+            panLeft();
+            e.preventDefault();
+            break;
+          case 'ArrowRight':
+            panRight();
+            e.preventDefault();
+            break;
+          case 'r':
+          case 'R':
+            resetView();
+            break;
+          case ' ':
+            // Space bar enables dragging
+            svgViewer.style.cursor = 'grabbing';
+            break;
+        }
+      });
+
+      document.addEventListener('keyup', function (e) {
+        if (e.key === ' ') {
+          svgViewer.style.cursor = '';
+        }
+      });
+
+      // Initialize
+      updateZoomDisplay();
+    });
+  </script>
+</body>
+
+</html>
