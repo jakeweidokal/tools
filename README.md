@@ -1,14 +1,35 @@
----
-name: HTML Starter
-slug: html-starter-with-analytics
-description: HTML5 template with analytics and advanced routing configuration.
-deployUrl: https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/solutions/html&project-name=html
-relatedTemplates:
-  - nextjs-boilerplate
----
 
-# HTML Starter
+# Jake Weidokal's Web Tools
 
-This is a starter HTML5 templates which is configured with Vercel Analytics (through a `script` tag), advanced routing with [Vercel Edge Middleware](https://vercel.com/docs/concepts/functions/edge-middleware), as well as some basic styles
+This repository contains a collection of single-page HTML/JavaScript web tools created by Jake Weidokal. These tools are designed to be simple, easy to use, and serve various purposes.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/solutions/html&project-name=html)
+## Tools
+
+The following tools are included in this repository:
+
+- **[Property Analyzer](https://tools.weidok.al/property-analyzer.html)**: Analyze property listings by pasting HTML content from property listing pages.
+- **[Drive for Deals](https://tools.weidok.al/drive-for-deals)**: Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings.
+- **[SVG Viewer](https://tools.weidok.al/svg-viewer.html)**: A tool to view and analyze SVG files.
+
+## Features
+
+- **HTML5 Template**: The repository is set up with a modern HTML5 template.
+- **Vercel Analytics**: Integrated with Vercel Analytics for tracking usage and performance.
+- **Advanced Routing**: Configured with Vercel Edge Middleware for advanced routing capabilities.
+- **Basic Styles**: Includes some basic CSS styles for a clean and consistent look.
+
+## Deployment
+
+You can deploy this repository to Vercel with a single click:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/jakeweidokal/tools&project-name=tools)
+
+## Getting Started
+
+To get started with these tools, simply clone the repository and open the `index.html` file in your web browser:
+
+```sh
+git clone https://github.com/jakeweidokal/tools.git
+cd tools
+open index.html
+```
