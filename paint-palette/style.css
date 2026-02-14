@@ -1,0 +1,134 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #d2d2d7;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.sweet-note {
+    font-size: 0.9rem;
+    color: #6e6e73;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+#search-bar {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    font-size: 1rem;
+}
+
+main {
+    padding: 1.5rem;
+}
+
+#comparison-container, #color-list-container {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+#color-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+#comparison-colors {
+    display: flex;
+    gap: 0;
+}
+
+.color-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.color-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.color-swatch {
+    height: 120px;
+}
+
+.color-info {
+    padding: 1rem;
+}
+
+.color-info h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.color-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6e6e73;
+}
+
+#comparison-colors .color-swatch {
+    height: 200px;
+}
+
+#comparison-colors .color-card {
+    cursor: default;
+    flex: 1;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#comparison-colors .color-card:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+#comparison-colors .color-card:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+#comparison-colors .color-card .remove-btn {
+    float: right;
+    cursor: pointer;
+    color: #f44336;
+    font-weight: 500;
+    font-size: 1.25rem;
+}
+
+.brand-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    float: right;
+}
