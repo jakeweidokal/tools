@@ -5,21 +5,137 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script defer src="/_vercel/insights/script.js"></script>
-  <title>Tools</title>
-  <meta name="description" content="A coolection of web tools made by Jake Weidokal" />
+  <title>Jake's Tools</title>
+  <meta name="description" content="A collection of web tools made by Jake Weidokal" />
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --accent: #2563eb;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--accent);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .card-description {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Tools</h1>
-  <p>
-    Below are single page html/javascript web tools I've built for myself.
-  </p>
-  <ul>
-    <li><a href="property-analyzer.html">Property Analyzer</a></li>
-    <li><a href="drive-for-deals">Drive for Deals</a></li>
-    <li><a href="svg-viewer">SVG Viewer</a></li>
-    <li><a href="paint-palette">Paint Palette</a></li>
-  </ul>
+  <div class="container">
+    <header>
+      <h1>Tools</h1>
+      <p class="subtitle">A collection of niche, single-page utilities made by <a href="https://weidok.al" target="_blank" rel="noopener noreferrer">Jake</a>.</p>
+    </header>
+
+    <main class="grid">
+      <a href="property-analyzer.html" class="card">
+        <div class="card-icon">🏠</div>
+        <div class="card-title">Property Analyzer</div>
+        <div class="card-description">Surgical analysis of property listings by pasting HTML data from Zillow or Redfin.</div>
+      </a>
+
+      <a href="drive-for-deals" class="card">
+        <div class="card-icon">🚗</div>
+        <div class="card-title">Drive for Deals</div>
+        <div class="card-description">Pin, track, and export potential real estate deals on an interactive map.</div>
+      </a>
+
+      <a href="svg-viewer" class="card">
+        <div class="card-icon">🖼️</div>
+        <div class="card-title">SVG Viewer</div>
+        <div class="card-description">High-performance viewer for inspecting and manipulating SVG graphics.</div>
+      </a>
+
+      <a href="paint-palette" class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Paint Palette</div>
+        <div class="card-description">A little tool to help my wife compare paint colors across manufacturers. ❤️</div>
+      </a>
+    </main>
+  </div>
 </body>
 
 </html>
