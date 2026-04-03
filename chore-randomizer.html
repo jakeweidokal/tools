@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chore Mystery Box!</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #f59e0b;
+      --success: #10b981;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --box-color: #8b5cf6;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .app-container {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .main-content { flex: 1.5; }
+      .side-content { flex: 1; position: sticky; top: 20px; }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+      color: var(--primary);
+    }
+
+    /* Mystery Box Styles */
+    .box-area {
+      position: relative;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      overflow: hidden;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+      border-radius: 20px;
+    }
+
+    .box-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      z-index: 5;
+      cursor: pointer;
+    }
+
+    .box {
+      width: 100%;
+      height: 100%;
+      background: var(--box-color);
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 10px 0 #6d28d9, 0 15px 25px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .box-lid {
+      position: absolute;
+      top: -15px;
+      left: -5px;
+      width: calc(100% + 10px);
+      height: 30px;
+      background: #a78bfa;
+      border-radius: 6px;
+      box-shadow: 0 4px 0 #7c3aed;
+      z-index: 6;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Box Animations */
+    .shake {
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg) scale(1.05); }
+      75% { transform: rotate(-5deg) scale(1.05); }
+    }
+
+    .box-open .box-lid {
+      transform: translateY(-60px) rotate(-15deg);
+    }
+
+    /* Floating Paper */
+    .paper {
+      position: absolute;
+      width: 240px;
+      background: white;
+      padding: 2rem;
+      border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+      transform: translateY(100px) scale(0);
+      opacity: 0;
+      z-index: 10;
+      border-top: 8px solid var(--secondary);
+    }
+
+    .paper-fly {
+      animation: flyUp 1.5s forwards cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes flyUp {
+      0% { transform: translateY(50px) scale(0.2); opacity: 0; }
+      100% { transform: translateY(-120px) scale(1.2); opacity: 1; }
+    }
+
+    /* Result Actions */
+    .actions {
+      margin-top: 2rem;
+      display: none;
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+
+    .actions .btn {
+      flex: 1;
+    }
+
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 0 #4338ca; }
+    .btn-success { background: var(--success); color: white; box-shadow: 0 4px 0 #059669; }
+    .btn-secondary { background: #e2e8f0; color: var(--text); }
+    
+    .btn:active { transform: translateY(2px); box-shadow: none; }
+
+    /* Chore List Sidebar */
+    .side-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    .chore-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    .chore-item:last-child { border: none; }
+
+    .chore-info { display: flex; flex-direction: column; }
+    .chore-stats { font-size: 0.75rem; color: var(--muted); }
+
+    .btn-delete { color: #ef4444; background: none; border: none; cursor: pointer; padding: 4px; font-weight: bold; }
+
+    /* Management & Import/Export */
+    .mgmt-drawer { margin-top: 1.5rem; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+    input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
+    
+    .data-view {
+      display: none;
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      box-sizing: border-box;
+    }
+
+    .confetti { position: fixed; pointer-events: none; z-index: 100; }
+
+    /* Success Overlay */
+    .success-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s forwards;
+    }
+
+    .success-gif {
+      max-width: 90%;
+      max-height: 70%;
+      border-radius: 20px;
+      box-shadow: 0 0 50px var(--primary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="success-overlay" class="success-overlay">
+    <h1 style="color: white; font-size: 3rem; margin-bottom: 1rem;">AMAZING JOB! 🎉</h1>
+    <img src="./office-celebrate.gif" class="success-gif" alt="Celebration!">
+  </div>
+
+  <div class="app-container">
+    <main class="main-content">
+      <header>
+        <a href="/" style="text-decoration:none; color: var(--muted); font-size: 0.8rem;">← Back to Tools</a>
+        <h1>Chore Mystery Box</h1>
+        <p style="color:var(--muted)">Shake the box to discover your next 15-minute win!</p>
+      </header>
+
+      <div class="box-area" id="box-area">
+        <div id="paper" class="paper">Wipe the kitchen counters!</div>
+        
+        <div class="box-wrapper" id="box-wrapper">
+          <div id="box-lid" class="box-lid"></div>
+          <div id="box-body" class="box"></div>
+        </div>
+
+        <div class="actions" id="actions">
+          <button id="done-btn" class="btn btn-success">I DID IT! ✅</button>
+          <button id="skip-btn" class="btn btn-secondary">Skip / Reset 🔄</button>
+        </div>
+
+        <button id="draw-btn" class="btn btn-primary" style="margin-top: 2rem; max-width: 200px;">Shake the Box! 🎁</button>
+      </div>
+    </main>
+
+    <aside class="side-content">
+      <h3 style="margin-top:0">Your Chores</h3>
+      <div class="input-row">
+        <input type="text" id="new-chore-input" placeholder="Add a chore...">
+        <button id="add-btn" class="btn btn-primary" style="padding: 10px; flex: 0;">Add</button>
+      </div>
+
+      <div id="chore-list" style="max-height: 400px; overflow-y: auto;"></div>
+
+      <div class="mgmt-drawer">
+        <button id="toggle-data" class="btn btn-secondary" style="width:100%; font-size:0.8rem;">Import/Export List</button>
+        <div id="data-view" class="data-view">
+          <textarea id="data-area"></textarea>
+          <div class="input-row">
+            <button id="import-btn" class="btn btn-primary" style="font-size:0.8rem;">Import</button>
+            <button id="copy-btn" class="btn btn-secondary" style="font-size:0.8rem;">Copy</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // --- Data Management ---
+    const DEFAULT_CHORES = [
+  "Wipe down the kitchen counters",
+  "Empty the dishwasher",
+  "Load the dishwasher",
+  "Take out the trash",
+  "Sweep the kitchen floor",
+  "Vacuum a single room",
+  "Dust the coffee table and TV stand",
+  "Clean the bathroom mirror",
+  "Wipe down the bathroom sink",
+  "Scrub the toilet bowl",
+  "Fold a load of laundry",
+  "Put away a basket of clean clothes",
+  "Make the bed",
+  "Tidy up the living room pillows and blankets",
+  "Sort the daily mail",
+  "Water the indoor plants",
+  "Clean the microwave interior",
+  "Wipe down the refrigerator handle and front",
+  "Empty all small wastebaskets",
+  "Clear off the dining room table",
+  "Scrub the kitchen sink",
+  "Wipe down baseboards in one room",
+  "Organize the shoe rack",
+  "Clean the stovetop",
+  "Wipe sticky fingerprints off light switches",
+  "Dust the window sills",
+  "Replace the bathroom towels",
+  "Clean the crumbs out of the toaster",
+  "Shake out the front door mat",
+  "Wipe down the computer keyboard and mouse"
+];
+
+    let chores = JSON.parse(localStorage.getItem('chores_v2')) || 
+      DEFAULT_CHORES.map(text => ({ text, lastDone: 0, completions: 0, id: Math.random().toString(36).substr(2, 9) }));
+
+    function save() {
+      localStorage.setItem('chores_v2', JSON.stringify(chores));
+      renderList();
+    }
+
+    function renderList() {
+      const list = document.getElementById('chore-list');
+      list.innerHTML = chores.map(c => `
+        <div class="chore-item">
+          <div class="chore-info">
+            <span>${c.text}</span>
+            <span class="chore-stats">Done ${c.completions}x • ${c.lastDone ? new Date(c.lastDone).toLocaleDateString() : 'Never'}</span>
+          </div>
+          <button class="btn-delete" onclick="deleteChore('${c.id}')">✕</button>
+        </div>
+      `).join('');
+    }
+
+    window.deleteChore = (id) => {
+      chores = chores.filter(c => c.id !== id);
+      save();
+    };
+
+    // --- Audio ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSfx(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      if (type === 'shake') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      } else if (type === 'celebrate') {
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
+          g.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.1);
+          g.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + i * 0.1 + 0.05);
+          g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + i * 0.1 + 0.2);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(audioCtx.currentTime + i * 0.1);
+          o.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+        });
+        return; // Fanfare handles its own osc
+      }
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // --- Interaction ---
+    let currentChore = null;
+
+    async function shakeAndDraw() {
+      const box = document.getElementById('box-wrapper');
+      const paper = document.getElementById('paper');
+      const drawBtn = document.getElementById('draw-btn');
+      const actions = document.getElementById('actions');
+
+      drawBtn.style.display = 'none';
+      box.classList.add('shake');
+      
+      // Multi-shake sound
+      for(let i=0; i<6; i++) {
+        playSfx('shake');
+        await new Promise(r => setTimeout(r, 150));
+      }
+
+      box.classList.remove('shake');
+      box.classList.add('box-open');
+      playSfx('pop');
+
+      // Select weighted chore
+      const sorted = [...chores].sort((a, b) => a.lastDone - b.lastDone);
+      const topFew = sorted.slice(0, Math.max(3, Math.floor(chores.length * 0.3)));
+      currentChore = topFew[Math.floor(Math.random() * topFew.length)];
+
+      paper.innerText = currentChore.text;
+      paper.classList.add('paper-fly');
+      
+      setTimeout(() => {
+        actions.style.display = 'flex';
+        createConfetti(30);
+      }, 1000);
+    }
+
+    function resetBox() {
+      const box = document.getElementById('box-wrapper');
+      const paper = document.getElementById('paper');
+      const drawBtn = document.getElementById('draw-btn');
+      const actions = document.getElementById('actions');
+
+      box.classList.remove('box-open', 'shake');
+      paper.classList.remove('paper-fly');
+      actions.style.display = 'none';
+      drawBtn.style.display = 'block';
+    }
+
+    function createConfetti(count = 30) {
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.top = Math.random() * 100 + 'vh';
+        c.style.width = '10px';
+        c.style.height = '10px';
+        c.style.backgroundColor = ['#6366f1', '#f59e0b', '#10b981', '#ec4899'][Math.floor(Math.random()*4)];
+        document.body.appendChild(c);
+        
+        c.animate([
+          { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+          { transform: `translate(${(Math.random()-0.5)*800}px, ${(Math.random()-0.5)*800}px) rotate(${Math.random()*720}deg)`, opacity: 0 }
+        ], { duration: 2000, easing: 'ease-out' }).onfinish = () => c.remove();
+      }
+    }
+
+    // --- Events ---
+    document.getElementById('draw-btn').addEventListener('click', shakeAndDraw);
+    document.getElementById('box-wrapper').addEventListener('click', () => {
+      if (document.getElementById('draw-btn').style.display !== 'none') shakeAndDraw();
+    });
+
+    document.getElementById('done-btn').addEventListener('click', () => {
+      if (currentChore) {
+        currentChore.lastDone = Date.now();
+        currentChore.completions++;
+        save();
+        
+        // Massive celebration
+        const overlay = document.getElementById('success-overlay');
+        overlay.style.display = 'flex';
+        playSfx('celebrate');
+        createConfetti(150);
+        
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          resetBox();
+        }, 4000);
+      }
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', resetBox);
+
+    document.getElementById('add-btn').addEventListener('click', () => {
+      const input = document.getElementById('new-chore-input');
+      if (input.value.trim()) {
+        chores.push({ text: input.value.trim(), lastDone: 0, completions: 0, id: Math.random().toString(36).substr(2, 9) });
+        input.value = '';
+        save();
+      }
+    });
+
+    // --- Import/Export Logic Fix ---
+    document.getElementById('toggle-data').addEventListener('click', () => {
+      const view = document.getElementById('data-view');
+      const area = document.getElementById('data-area');
+      view.style.display = view.style.display === 'block' ? 'none' : 'block';
+      area.value = chores.map(c => c.text).join('\n');
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      const area = document.getElementById('data-area');
+      try {
+        await navigator.clipboard.writeText(area.value);
+        alert('Chore list copied to clipboard!');
+      } catch (err) {
+        area.select();
+        document.execCommand('copy');
+        alert('Copied!');
+      }
+    });
+
+    document.getElementById('import-btn').addEventListener('click', () => {
+      const text = document.getElementById('data-area').value.trim();
+      if (!text) return;
+      
+      try {
+        let newChores;
+        if (text.startsWith('[')) {
+          newChores = JSON.parse(text);
+        } else {
+          newChores = text.split('\n').filter(t => t.trim()).map(t => ({
+            text: t.trim(),
+            lastDone: 0,
+            completions: 0,
+            id: Math.random().toString(36).substr(2, 9)
+          }));
+        }
+        chores = newChores;
+        save();
+        alert('Successfully imported ' + chores.length + ' chores!');
+        document.getElementById('data-view').style.display = 'none';
+      } catch (e) {
+        alert('Import failed. Please check the format.');
+      }
+    });
+
+    // Init
+    renderList();
+  </script>
+</body>
+
+</html>
