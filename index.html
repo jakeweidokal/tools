@@ -5,99 +5,314 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script defer src="/_vercel/insights/script.js"></script>
-  <title>Jake's Tools</title>
-  <meta name="description" content="A collection of web tools made by Jake Weidokal" />
+  <title>Tools · Jake Weidokal</title>
+  <meta name="description" content="A collection of web tools and single-page utilities made by Jake Weidokal." />
+  <link rel="shortcut icon" href="https://micro.blog/jaek/favicon.png" type="image/x-icon" />
+
   <style>
     :root {
-      --bg-color: #f8fafc;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --accent: #2563eb;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --color-text: #000000;
+      --color-text-light: #333333;
+      --color-text-muted: #666666;
+      --color-background: #ffffff;
+      --color-background-alt: #f8f9fa;
+      --color-border: #e1e5e9;
+      --color-border-light: #f1f3f4;
+      --color-card-bg: #ffffff;
+      --color-card-hover-bg: #f8f9fa;
+      --color-card-border: #e1e5e9;
+      --color-card-border-hover: #999999;
+      --color-link: #555555;
+      --color-link-hover: #000000;
+      --color-tag-bg: #f1f3f4;
+      --color-tag-text: #555555;
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+      --font-family-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+      --container-width: 44rem;
+      --radius-small: 5px;
+      --radius-medium: 8px;
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.2s ease;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-text: #e5e5e5;
+        --color-text-light: #cccccc;
+        --color-text-muted: #999999;
+        --color-background: #1a1a1a;
+        --color-background-alt: #2a2a2a;
+        --color-border: #404040;
+        --color-border-light: #333333;
+        --color-card-bg: #222222;
+        --color-card-hover-bg: #2a2a2a;
+        --color-card-border: #333333;
+        --color-card-border-hover: #666666;
+        --color-link: #aaaaaa;
+        --color-link-hover: #ffffff;
+        --color-tag-bg: #2d2d2d;
+        --color-tag-text: #aaaaaa;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      margin: 0;
-      padding: 2rem;
-      line-height: 1.5;
+      font-family: var(--font-family-base);
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background-color: var(--color-background);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color var(--transition-base), color var(--transition-base);
     }
 
     .container {
-      max-width: 900px;
+      max-width: var(--container-width);
       margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
     }
 
-    header {
-      margin-bottom: 3rem;
-      text-align: center;
+    /* Site Header */
+    .site-header {
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--color-border-light);
     }
 
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 1.125rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    .header-container {
       display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow);
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--accent);
-    }
-
-    .card-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--accent);
-    }
-
-    .card-description {
-      color: var(--text-muted);
+    .site-branding {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.95rem;
     }
 
-    @media (max-width: 640px) {
-      body {
-        padding: 1.5rem;
+    .site-title-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--color-text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site-title-link:hover {
+      color: var(--color-text);
+    }
+
+    .title-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--color-border);
+    }
+
+    .site-breadcrumb-sep {
+      color: var(--color-text-muted);
+      font-weight: 300;
+    }
+
+    .site-breadcrumb-current {
+      color: var(--color-text-muted);
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .site-nav a {
+      color: var(--color-link);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .site-nav a:hover {
+      color: var(--color-link-hover);
+    }
+
+    /* Intro */
+    .intro {
+      margin-bottom: 2.5rem;
+    }
+
+    .intro h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro p {
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .intro p a {
+      color: var(--color-text);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      text-decoration-thickness: 1px;
+    }
+
+    .intro p a:hover {
+      text-decoration-thickness: 2px;
+    }
+
+    /* Tools Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-medium);
+      padding: 1.25rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .tool-card:hover {
+      background: var(--color-card-hover-bg);
+      border-color: var(--color-card-border-hover);
+      transform: translateY(-1px);
+    }
+
+    .tool-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+
+    .tool-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .tool-link-arrow {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      transition: color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .tool-card:hover .tool-link-arrow {
+      color: var(--color-text);
+      transform: translate(2px, -2px);
+    }
+
+    .tool-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.01em;
+    }
+
+    .tool-description {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      flex-grow: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .tool-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .tool-tag {
+      font-size: 0.75rem;
+      font-family: var(--font-family-mono);
+      background-color: var(--color-tag-bg);
+      color: var(--color-tag-text);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-small);
+      letter-spacing: 0.02em;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--color-border-light);
+      padding-top: 2rem;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+    }
+
+    .footer-links a {
+      color: var(--color-link);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--color-link-hover);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    .footer-sep {
+      color: var(--color-border);
+    }
+
+    .footer-meta {
+      font-size: 0.825rem;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem 1rem 3rem;
       }
-      h1 {
-        font-size: 2rem;
+
+      .intro h1 {
+        font-size: 1.85rem;
+      }
+
+      .tools-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -105,43 +320,145 @@
 
 <body>
   <div class="container">
-    <header>
-      <h1>Tools</h1>
-      <p class="subtitle">A collection of niche, single-page utilities made by <a href="https://weidok.al" target="_blank" rel="noopener noreferrer">Jake</a>.</p>
+    <header class="site-header">
+      <div class="header-container">
+        <div class="site-branding">
+          <a href="https://weidok.al" class="site-title-link">
+            <img src="https://avatars.micro.blog/avatars/2025/36/1545970.jpg" alt="Jake Weidokal" class="title-avatar" width="28" height="28" />
+            <span>Jake Weidokal</span>
+          </a>
+          <span class="site-breadcrumb-sep">/</span>
+          <span class="site-breadcrumb-current">tools</span>
+        </div>
+        <nav class="site-nav">
+          <a href="https://weidok.al">Home</a>
+          <a href="https://weidok.al/articles">Articles</a>
+          <a href="https://weidok.al/about">About</a>
+          <a href="https://github.com/jakeweidokal/tools" target="_blank" rel="noopener noreferrer">Source</a>
+        </nav>
+      </div>
     </header>
 
-    <main class="grid">
-      <a href="property-analyzer.html" class="card">
-        <div class="card-icon">🏠</div>
-        <div class="card-title">Property Analyzer</div>
-        <div class="card-description">Surgical analysis of property listings by pasting HTML data from Zillow or Redfin.</div>
-      </a>
+    <main>
+      <div class="intro">
+        <h1>Tools</h1>
+        <p>A collection of single-page utilities, mini-apps, and web experiments created by <a href="https://weidok.al" target="_blank" rel="noopener noreferrer">Jake Weidokal</a>.</p>
+      </div>
 
-      <a href="drive-for-deals" class="card">
-        <div class="card-icon">🚗</div>
-        <div class="card-title">Drive for Deals</div>
-        <div class="card-description">Pin, track, and export potential real estate deals on an interactive map.</div>
-      </a>
+      <div class="tools-grid">
+        <a href="https://jakeweidokal.github.io/oss-issues/" target="_blank" rel="noopener noreferrer" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🛰️</span>
+            <span class="tool-link-arrow">↗</span>
+          </div>
+          <div class="tool-title">OSS Issues Radar</div>
+          <div class="tool-description">Automated radar scanning GitHub for verified, solvable open-source issues with active maintainers.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">github-pages</span>
+          </div>
+        </a>
 
-      <a href="svg-viewer" class="card">
-        <div class="card-icon">🖼️</div>
-        <div class="card-title">SVG Viewer</div>
-        <div class="card-description">High-performance viewer for inspecting and manipulating SVG graphics.</div>
-      </a>
+        <a href="property-analyzer.html" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🏠</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">Property Analyzer</div>
+          <div class="tool-description">Surgical analysis of property listings by pasting HTML data from Zillow or Redfin.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">calculator</span>
+          </div>
+        </a>
 
-      <a href="paint-palette" class="card">
-        <div class="card-icon">🎨</div>
-        <div class="card-title">Paint Palette</div>
-        <div class="card-description">A little tool to help my wife compare paint colors across manufacturers. ❤️</div>
-      </a>
+        <a href="drive-for-deals" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🚗</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">Drive for Deals</div>
+          <div class="tool-description">Pin, track, and export potential real estate investment deals on an interactive map.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">pwa</span>
+          </div>
+        </a>
 
-      <a href="chore-randomizer.html" class="card">
-        <div class="card-icon">🎡</div>
-        <div class="card-title">Chore Prize Wheel</div>
-        <div class="card-description">Gamify your housework with a spinning wheel and win a cleaner home in 15 minutes.</div>
-      </a>
+        <a href="svg-viewer" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🖼️</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">SVG Viewer</div>
+          <div class="tool-description">High-performance viewer for inspecting, panning, zooming, and manipulating SVG graphics.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">graphics</span>
+          </div>
+        </a>
+
+        <a href="paint-palette" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🎨</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">Paint Palette</div>
+          <div class="tool-description">Compare and search paint colors across major paint manufacturers.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">color</span>
+          </div>
+        </a>
+
+        <a href="chore-randomizer.html" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🎡</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">Chore Prize Wheel</div>
+          <div class="tool-description">Gamify your housework with a spinning wheel and win a cleaner home in 15 minutes.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">interactive</span>
+          </div>
+        </a>
+
+        <a href="big-questions.html" class="tool-card">
+          <div class="tool-card-top">
+            <span class="tool-icon">🦉</span>
+            <span class="tool-link-arrow">→</span>
+          </div>
+          <div class="tool-title">Big Questions for Little Thinkers</div>
+          <div class="tool-description">Family conversation cards bridging philosophy, ethics, faith, and wonder for dinner tables and bedtime.</div>
+          <div class="tool-meta">
+            <span class="tool-tag">cards</span>
+          </div>
+        </a>
+      </div>
     </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <nav class="footer-links" aria-label="Social and site links">
+          <a href="https://weidok.al">weidok.al</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="https://github.com/jakeweidokal" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="https://www.linkedin.com/in/jacob-weidokal/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="https://mastodon.social/@jakeweidokal" target="_blank" rel="noopener noreferrer">Mastodon</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="https://goodreads.com/jakeweidokal" target="_blank" rel="noopener noreferrer">Goodreads</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="mailto:weidokalj@gmail.com">Email</a>
+          <span class="footer-sep" aria-hidden="true">·</span>
+          <a href="https://weidok.al/feed.xml">RSS</a>
+        </nav>
+        <p class="footer-meta">
+          © <span id="year"></span> Jacob Weidokal. Built with ☕ and ❤️
+        </p>
+      </div>
+    </footer>
   </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 
 </html>

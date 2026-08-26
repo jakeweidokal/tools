@@ -7,9 +7,13 @@ This repository contains a collection of single-page HTML/JavaScript web tools c
 
 The following tools are included in this repository:
 
+- **[OSS Issues Radar](https://jakeweidokal.github.io/oss-issues/)**: Automated radar scanning GitHub for verified, solvable open-source issues with active maintainers.
 - **[Property Analyzer](https://tools.weidok.al/property-analyzer.html)**: Analyze property listings by pasting HTML content from property listing pages.
 - **[Drive for Deals](https://tools.weidok.al/drive-for-deals)**: Map and track potential investment properties while you drive. Pin locations, add notes, and export your findings.
 - **[SVG Viewer](https://tools.weidok.al/svg-viewer.html)**: A tool to view and analyze SVG files.
+- **[Paint Palette](https://tools.weidok.al/paint-palette)**: Compare paint colors across major manufacturers.
+- **[Chore Prize Wheel](https://tools.weidok.al/chore-randomizer.html)**: Gamify household chores with interactive prizes and randomizer.
+- **[Big Questions for Little Thinkers](https://tools.weidok.al/big-questions.html)**: Family conversation cards bridging philosophy, ethics, faith, and wonder for dinner tables and bedtime.
 
 ## Deployment
 

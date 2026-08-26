@@ -17,10 +17,13 @@ The project is structured as a monorepo containing multiple independent, single-
 ## Key Files and Directories
 
 *   `index.html`: The main entry point that links to the other tools.
+*   `OSS Issues Radar` (External): Automated radar scanning GitHub for verified solvable issues (`https://jakeweidokal.github.io/oss-issues/`).
 *   `property-analyzer.html`: A tool to analyze property listings by pasting HTML content.
 *   `drive-for-deals/`: A Progressive Web App (PWA) for mapping and tracking investment properties. It uses Leaflet.js for the interactive map.
 *   `svg-viewer.html`: A utility to view, pan, and zoom SVG files.
 *   `paint-palette/`: A tool for searching and comparing paint colors.
+*   `chore-randomizer.html`: Gamified chore prize wheel and timer.
+*   `big-questions.html`: Family conversation cards bridging philosophy, ethics, faith, and wonder.
 *   `middleware.js`: Vercel edge middleware to inject security headers into responses.
 *   `package.json`: Defines the single dependency for Vercel edge functions.
 
