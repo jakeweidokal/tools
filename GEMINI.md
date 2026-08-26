@@ -24,6 +24,8 @@ The project is structured as a monorepo containing multiple independent, single-
 *   `paint-palette/`: A tool for searching and comparing paint colors.
 *   `chore-randomizer.html`: Gamified chore prize wheel and timer.
 *   `big-questions.html`: Family conversation cards bridging philosophy, ethics, faith, and wonder.
+*   `good-company.html`: Group conversation game with 500 prompts across hilarious hypotheticals, friendly debates, heartwarming memories, and real talk.
+*   `marriage-conversations.html`: 500 prompts for married couples to grow closer across romance, teamwork, vulnerability, future dreams, and spiritual intimacy.
 *   `middleware.js`: Vercel edge middleware to inject security headers into responses.
 *   `package.json`: Defines the single dependency for Vercel edge functions.
 

@@ -14,6 +14,8 @@ The following tools are included in this repository:
 - **[Paint Palette](https://tools.weidok.al/paint-palette)**: Compare paint colors across major manufacturers.
 - **[Chore Prize Wheel](https://tools.weidok.al/chore-randomizer.html)**: Gamify household chores with interactive prizes and randomizer.
 - **[Big Questions for Little Thinkers](https://tools.weidok.al/big-questions.html)**: Family conversation cards bridging philosophy, ethics, faith, and wonder for dinner tables and bedtime.
+- **[Good Company](https://tools.weidok.al/good-company.html)**: 500 laugh-out-loud, heartwarming, and chaotic conversation prompts for gatherings and game nights.
+- **[Growing Closer](https://tools.weidok.al/marriage-conversations.html)**: 500 conversation prompts for married couples to cultivate romance, laughter, teamwork, and spiritual intimacy.
 
 ## Deployment
 
