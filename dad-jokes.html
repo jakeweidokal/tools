@@ -534,14 +534,6 @@
       padding: 0.75rem 0;
     }
 
-    .card-topic-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--color-text-muted);
-    }
-
     .card-joke-setup {
       font-family: var(--font-family-serif);
       font-size: 1.7rem;
@@ -1344,7 +1336,6 @@
               </div>
 
               <div class="card-body-front">
-                <div class="card-topic-title" id="cardTopicTitle">Resolution Realism</div>
                 <div class="card-joke-setup" id="cardJokeSetup">My New Year's resolution was to lose 10 pounds...</div>
               </div>
 
@@ -1511,10 +1502,6 @@
           <button class="modal-close" id="closeCustomModal">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label" for="customTitle">Joke Title / Topic:</label>
-            <input type="text" id="customTitle" class="form-input" placeholder="e.g. Lawn Perfection" />
-          </div>
           <div class="form-group">
             <label class="form-label" for="customSetup">Setup (The Question):</label>
             <textarea id="customSetup" class="form-textarea" rows="2" placeholder="e.g. What did the lawnmower say to the overgrown grass?"></textarea>
@@ -1803,7 +1790,6 @@
     const cardBackCategoryTag = document.getElementById('cardBackCategoryTag');
     const starCardBtn = document.getElementById('starCardBtn');
     const starCardBackBtn = document.getElementById('starCardBackBtn');
-    const cardTopicTitle = document.getElementById('cardTopicTitle');
     const cardJokeSetup = document.getElementById('cardJokeSetup');
     const cardJokePunchline = document.getElementById('cardJokePunchline');
     const cardCounterSmall = document.getElementById('cardCounterSmall');
@@ -1948,7 +1934,6 @@
       cardCategoryTag.textContent = catName;
       cardBackCategoryTag.textContent = catName;
 
-      cardTopicTitle.textContent = joke.title || "Dad Groaner";
       cardJokeSetup.textContent = joke.setup;
       cardJokePunchline.textContent = joke.punchline;
 
@@ -1984,7 +1969,6 @@
         cardDateBadge.textContent = "No Match";
         todayMarker.style.display = "none";
         cardCategoryTag.textContent = "-";
-        cardTopicTitle.textContent = "No Jokes Found";
         cardJokeSetup.textContent = "No dad jokes match your active filter. Try selecting 'All Categories' or 'All Days'.";
         cardJokePunchline.textContent = "Reset filters to explore 366 daily jokes!";
         cardCounterSmall.textContent = "0 / 0";
@@ -2418,7 +2402,6 @@
     // --- 10. CUSTOM DAD JOKE MODAL ---
     function initCustomJokeModal() {
       addCustomBtn.addEventListener('click', () => {
-        document.getElementById('customTitle').value = '';
         document.getElementById('customSetup').value = '';
         document.getElementById('customPunchline').value = '';
         customJokeModal.style.display = 'flex';
@@ -2428,7 +2411,6 @@
       cancelCustomBtn.addEventListener('click', () => customJokeModal.style.display = 'none');
 
       saveCustomBtn.addEventListener('click', () => {
-        const title = document.getElementById('customTitle').value.trim() || "Custom Dad Groaner";
         const setup = document.getElementById('customSetup').value.trim();
         const punchline = document.getElementById('customPunchline').value.trim();
         const category = document.getElementById('customCategory').value;
@@ -2447,7 +2429,6 @@
           day: 1,
           category: category,
           categoryName: "Custom User Joke",
-          title: title,
           setup: setup,
           punchline: punchline
         };
