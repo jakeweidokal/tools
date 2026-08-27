@@ -256,40 +256,41 @@
 
     .handwritten-note {
       position: absolute;
-      bottom: 25px;
-      left: -20px;
+      top: 50px;
+      right: 175px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end;
       pointer-events: none;
       white-space: nowrap;
-      transform: rotate(-8deg);
+      transform: rotate(-9deg);
       animation: handSway 4s infinite ease-in-out;
     }
 
     @keyframes handSway {
-      0%, 100% { transform: rotate(-8deg) translateY(0); }
-      50% { transform: rotate(-6deg) translateY(-3px); }
+      0%, 100% { transform: rotate(-9deg) translateY(0); }
+      50% { transform: rotate(-7deg) translateY(-3px); }
     }
 
     .handwritten-text {
       font-family: "Caveat", "Patrick Hand", "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
-      font-size: 1.7rem;
+      font-size: 1.25rem;
       font-weight: 700;
       line-height: 1.1;
       color: var(--color-text);
       letter-spacing: 0.02em;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
       transition: transform 0.15s ease, color 0.15s ease;
       user-select: none;
     }
 
-    .handwritten-doodle {
-      width: 105px;
-      height: 14px;
+    .handwritten-arrow {
+      width: 48px;
+      height: 24px;
       color: var(--color-text);
-      opacity: 0.75;
-      margin-top: -2px;
+      opacity: 0.8;
+      margin-top: 2px;
+      margin-right: 6px;
     }
 
     /* Hero Section */
@@ -1108,17 +1109,17 @@
       }
 
       .handwritten-note {
-        bottom: 15px;
-        left: -15px;
+        top: 35px;
+        right: 125px;
       }
 
       .handwritten-text {
-        font-size: 1.35rem;
+        font-size: 1.05rem;
       }
 
-      .handwritten-doodle {
-        width: 80px;
-        height: 12px;
+      .handwritten-arrow {
+        width: 38px;
+        height: 19px;
       }
 
       .toolbar {
@@ -1224,8 +1225,9 @@
       <img src="hand.png" alt="Pull My Finger" class="hand-img" id="handImg" draggable="false" />
       <div class="handwritten-note" id="handTag">
         <div class="handwritten-text" id="fingerPrompt">pull my finger 💨</div>
-        <svg class="handwritten-doodle" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M 5 12 Q 30 3, 60 12 T 115 10" />
+        <svg class="handwritten-arrow" viewBox="0 0 50 25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 5 5 Q 32 3, 44 18" />
+          <path d="M 34 17 L 44 18 L 44 8" />
         </svg>
       </div>
     </div>
