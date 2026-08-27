@@ -16,6 +16,7 @@ The following tools are included in this repository:
 - **[Big Questions for Little Thinkers](https://tools.weidok.al/big-questions.html)**: Family conversation cards bridging philosophy, ethics, faith, and wonder for dinner tables and bedtime.
 - **[Good Company](https://tools.weidok.al/good-company.html)**: 500 laugh-out-loud, heartwarming, and chaotic conversation prompts for gatherings and game nights.
 - **[Growing Closer](https://tools.weidok.al/marriage-conversations.html)**: 500 conversation prompts for married couples to cultivate romance, laughter, teamwork, and spiritual intimacy.
+- **[Daily Dad Jokes](https://tools.weidok.al/dad-jokes.html)**: 366 daily groaners for every day of the year with 3D card flips, 'Pull My Finger' fart animations, and full vault directory.
 
 ## Deployment
 
