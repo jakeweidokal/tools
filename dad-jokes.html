@@ -254,10 +254,15 @@
 
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&display=swap');
 
+    /* 
+       HANDWRITTEN NOTE POSITION:
+       - 'top': increase to move DOWN, decrease to move UP
+       - 'right': increase to move LEFT (away from corner), decrease to move RIGHT (closer to hand)
+    */
     .handwritten-note {
       position: absolute;
-      top: 50px;
-      right: 175px;
+      top: 80px;     /* Adjust vertical position (e.g. 70px - 95px) */
+      right: 120px;  /* Adjust horizontal position (e.g. 100px - 140px) */
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -922,52 +927,86 @@
       gap: 0.4rem;
     }
 
-    /* Fart Cloud Fullscreen Particle Canvas Overlay */
-    .fart-overlay {
+    /* Floating Fart Cloud from right to left across screen */
+    .floating-fart-cloud {
       position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
+      top: 110px;
+      right: -140px;
       z-index: 9999;
+      pointer-events: none;
       display: none;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
     }
 
-    .fart-overlay.active {
+    .floating-fart-cloud.animating {
+      display: block;
+      animation: floatAcrossScreen 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    }
+
+    @keyframes floatAcrossScreen {
+      0% {
+        transform: translateX(0) translateY(0) scale(0.6);
+        opacity: 0;
+      }
+      15% {
+        transform: translateX(-18vw) translateY(-18px) scale(1.15);
+        opacity: 1;
+      }
+      50% {
+        transform: translateX(-55vw) translateY(14px) scale(1.05);
+        opacity: 0.95;
+      }
+      85% {
+        transform: translateX(-95vw) translateY(-10px) scale(0.9);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateX(-125vw) translateY(5px) scale(0.6);
+        opacity: 0;
+      }
+    }
+
+    .fart-cloud-cluster {
       display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
-    #fartCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+    .fart-emoji-main {
+      font-size: 3.8rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 12px rgba(132, 204, 22, 0.4));
+      animation: fartWobble 0.25s infinite alternate ease-in-out;
     }
 
-    .fart-banner-callout {
-      position: relative;
-      z-index: 10;
-      background: rgba(0, 0, 0, 0.85);
-      color: #ffffff;
-      padding: 1.25rem 2rem;
+    .fart-emoji-sub {
+      font-size: 2.2rem;
+      opacity: 0.75;
+      margin-left: -1rem;
+    }
+
+    .fart-squeak-bubble {
+      font-family: "Caveat", "Patrick Hand", cursive;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #65a30d;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1.5px dashed #84cc16;
+      padding: 0.2rem 0.6rem;
       border-radius: 999px;
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      border: 3px solid #84cc16;
-      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      white-space: nowrap;
+      transform: rotate(-6deg) translateY(-18px);
     }
 
-    @keyframes popIn {
-      0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
-      100% { transform: scale(1) rotate(0); opacity: 1; }
+    body.dark-theme .fart-squeak-bubble {
+      background: rgba(34, 34, 34, 0.95);
+      color: #a3e635;
+      border-color: #65a30d;
+    }
+
+    @keyframes fartWobble {
+      0% { transform: scale(1) rotate(-4deg); }
+      100% { transform: scale(1.08) rotate(4deg); }
     }
 
     /* Modals */
@@ -1109,8 +1148,8 @@
       }
 
       .handwritten-note {
-        top: 35px;
-        right: 125px;
+        top: 50px;
+        right: 85px;
       }
 
       .handwritten-text {
@@ -1120,6 +1159,18 @@
       .handwritten-arrow {
         width: 38px;
         height: 19px;
+      }
+
+      .floating-fart-cloud {
+        top: 80px;
+      }
+
+      .fart-emoji-main {
+        font-size: 2.6rem;
+      }
+
+      .fart-squeak-bubble {
+        font-size: 1.05rem;
       }
 
       .toolbar {
@@ -1427,12 +1478,12 @@
       </section>
     </main>
 
-    <!-- Fart Cloud Canvas Overlay -->
-    <div class="fart-overlay" id="fartOverlay">
-      <canvas id="fartCanvas"></canvas>
-      <div class="fart-banner-callout" id="fartBannerCallout">
-        <span>💨 PFFFFFT!</span>
-        <span>You pulled it! Opening the Dad Joke Vault...</span>
+    <!-- Floating Fart Cloud Element (Floats from right to left across screen) -->
+    <div class="floating-fart-cloud" id="floatingFartCloud">
+      <div class="fart-cloud-cluster">
+        <span class="fart-emoji-main">💨</span>
+        <span class="fart-emoji-sub">☁️</span>
+        <span class="fart-squeak-bubble">*squeeeak!*</span>
       </div>
     </div>
 
@@ -1644,76 +1695,67 @@
         if (!this.ctx) return;
         try {
           const now = this.ctx.currentTime;
-          const duration = 0.85 + Math.random() * 0.4;
+          const duration = 0.45 + Math.random() * 0.2;
 
-          // 1. FM Modulated Low Oscillator (The Flapping Rumble)
-          const baseOsc = this.ctx.createOscillator();
-          const modOsc = this.ctx.createOscillator();
+          // Squeaky Lead Oscillator (high-pitch squeak with fast FM vibrato chirp)
+          const osc = this.ctx.createOscillator();
+          const mod = this.ctx.createOscillator();
           const modGain = this.ctx.createGain();
-          const mainGain = this.ctx.createGain();
           const filter = this.ctx.createBiquadFilter();
+          const mainGain = this.ctx.createGain();
 
-          const startPitch = 90 + Math.random() * 35;
-          const endPitch = 42 + Math.random() * 20;
+          const baseFreq = 540 + Math.random() * 180; // High squeaky start pitch
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(baseFreq, now);
+          osc.frequency.exponentialRampToValueAtTime(190 + Math.random() * 40, now + duration * 0.7);
+          osc.frequency.exponentialRampToValueAtTime(340 + Math.random() * 60, now + duration); // Comical end pop
 
-          baseOsc.type = 'sawtooth';
-          baseOsc.frequency.setValueAtTime(startPitch, now);
-          baseOsc.frequency.exponentialRampToValueAtTime(endPitch, now + duration);
+          // Rapid vibrato modulation for the squeaky rubber squeak
+          mod.type = 'sine';
+          mod.frequency.setValueAtTime(38 + Math.random() * 15, now);
+          modGain.gain.setValueAtTime(80, now);
+          modGain.gain.exponentialRampToValueAtTime(10, now + duration);
+          mod.connect(modGain);
+          modGain.connect(osc.frequency);
 
-          // Modulation oscillator for the comical flutter
-          modOsc.type = 'sawtooth';
-          modOsc.frequency.setValueAtTime(22 + Math.random() * 8, now);
-          modGain.gain.setValueAtTime(45, now);
-          modGain.gain.linearRampToValueAtTime(15, now + duration);
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(750, now);
+          filter.frequency.exponentialRampToValueAtTime(280, now + duration);
+          filter.Q.setValueAtTime(6.0, now);
 
-          modOsc.connect(modGain);
-          modGain.connect(baseOsc.frequency);
-
-          // Resonant Low-pass Filter for acoustic body
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(420, now);
-          filter.frequency.exponentialRampToValueAtTime(110, now + duration);
-          filter.Q.setValueAtTime(4.5, now);
-
-          mainGain.gain.setValueAtTime(0.28, now);
+          mainGain.gain.setValueAtTime(0.3, now);
           mainGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-          baseOsc.connect(filter);
+          osc.connect(filter);
           filter.connect(mainGain);
           mainGain.connect(this.ctx.destination);
 
-          // 2. White Noise Burst (The Air Rush)
-          const bufferSize = this.ctx.sampleRate * duration;
+          // Short airy puff hiss
+          const bufferSize = Math.floor(this.ctx.sampleRate * duration * 0.5);
           const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const output = noiseBuffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) {
-            output[i] = Math.random() * 2 - 1;
-          }
+          for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
 
-          const whiteNoise = this.ctx.createBufferSource();
-          whiteNoise.buffer = noiseBuffer;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = noiseBuffer;
+          const nFilter = this.ctx.createBiquadFilter();
+          nFilter.type = 'highpass';
+          nFilter.frequency.setValueAtTime(850, now);
+          const nGain = this.ctx.createGain();
+          nGain.gain.setValueAtTime(0.12, now);
+          nGain.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.5);
 
-          const noiseFilter = this.ctx.createBiquadFilter();
-          noiseFilter.type = 'bandpass';
-          noiseFilter.frequency.setValueAtTime(280, now);
-          noiseFilter.Q.setValueAtTime(2.5, now);
+          noise.connect(nFilter);
+          nFilter.connect(nGain);
+          nGain.connect(this.ctx.destination);
 
-          const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.2, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+          osc.start(now);
+          mod.start(now);
+          noise.start(now);
 
-          whiteNoise.connect(noiseFilter);
-          noiseFilter.connect(noiseGain);
-          noiseGain.connect(this.ctx.destination);
-
-          // Start oscillators
-          baseOsc.start(now);
-          modOsc.start(now);
-          whiteNoise.start(now);
-
-          baseOsc.stop(now + duration + 0.05);
-          modOsc.stop(now + duration + 0.05);
-          whiteNoise.stop(now + duration + 0.05);
+          osc.stop(now + duration + 0.05);
+          mod.stop(now + duration + 0.05);
+          noise.stop(now + duration + 0.05);
         } catch (e) {
           console.error("Audio error:", e);
         }
@@ -1810,8 +1852,7 @@
     const handTag = document.getElementById('handTag');
     const fingerPrompt = document.getElementById('fingerPrompt');
     const fingerGaugeFill = document.getElementById('fingerGaugeFill');
-    const fartOverlay = document.getElementById('fartOverlay');
-    const fartCanvas = document.getElementById('fartCanvas');
+    const floatingFartCloud = document.getElementById('floatingFartCloud');
 
     let toastTimeout = null;
     function showToast(msg) {
@@ -2254,104 +2295,33 @@
       }
       if (handTag) handTag.style.animation = '';
       if (fingerGaugeFill) fingerGaugeFill.style.width = '0%';
-      fingerPrompt.textContent = "💨 pffffft!";
+      fingerPrompt.textContent = "💨 *squeak!*";
 
-      // 1. Play Authentic Synthesized Fart Audio
+      // 1. Play Squeaky Synthesized Fart Audio
       sounds.playFart();
 
-      // 2. Fart Cloud Canvas Particle Simulation (No Screen Shake)
-      fartOverlay.classList.add('active');
-      runFartCloudAnimation(() => {
-        fartOverlay.classList.remove('active');
-        fingerPrompt.textContent = "pull my finger 💨";
+      // 2. Animate Floating Fart Cloud from right to left across screen
+      const cloud = floatingFartCloud;
+      if (cloud) {
+        cloud.classList.remove('animating');
+        void cloud.offsetWidth; // trigger reflow
+        cloud.classList.add('animating');
+
+        // Smooth transition to Vault view mid-float
+        setTimeout(() => {
+          openVaultView();
+        }, 700);
+
+        setTimeout(() => {
+          cloud.classList.remove('animating');
+          fingerPrompt.textContent = "pull my finger 💨";
+          showToast("💨 Airing out the room... Welcome to the Vault!");
+        }, 1600);
+      } else {
         openVaultView();
+        fingerPrompt.textContent = "pull my finger 💨";
         showToast("💨 Airing out the room... Welcome to the Vault!");
-      });
-    }
-
-    function runFartCloudAnimation(onComplete) {
-      const canvas = fartCanvas;
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      // Calculate origin near the top-right hand widget
-      const rect = pullFingerWidget.getBoundingClientRect();
-      const originX = rect.left + rect.width / 2;
-      const originY = rect.top + rect.height / 2;
-
-      const particles = [];
-      const particleCount = 150;
-      const colors = ['#84cc16', '#a3e635', '#eab308', '#ca8a04', '#65a30d', '#facc15'];
-      const emojis = ['💨', '🤢', '🧀', '🎺', '💥', '👃', '🦨', '⚡'];
-
-      for (let i = 0; i < particleCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 3.5 + Math.random() * 13;
-        particles.push({
-          x: originX,
-          y: originY,
-          vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 4,
-          vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 4,
-          radius: 18 + Math.random() * 50,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          alpha: 0.85,
-          growth: 1.02 + Math.random() * 0.03,
-          emoji: Math.random() > 0.68 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
-          rotation: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.1
-        });
       }
-
-      let startTime = performance.now();
-      const animDuration = 1400; // ms
-
-      function animate(time) {
-        const elapsed = time - startTime;
-        const progress = elapsed / animDuration;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Billowing background cloud tint
-        ctx.fillStyle = `rgba(132, 204, 22, ${Math.max(0, (1 - progress) * 0.25)})`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        particles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vx *= 0.96;
-          p.vy *= 0.96;
-          p.radius *= p.growth;
-          p.rotation += p.rotSpeed;
-          p.alpha = Math.max(0, (1 - progress * 1.1) * 0.85);
-
-          ctx.save();
-          ctx.globalAlpha = p.alpha;
-
-          if (p.emoji) {
-            ctx.font = `${p.radius * 0.9}px sans-serif`;
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.rotation);
-            ctx.fillText(p.emoji, -p.radius * 0.45, p.radius * 0.35);
-          } else {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.fill();
-          }
-
-          ctx.restore();
-        });
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          if (onComplete) onComplete();
-        }
-      }
-
-      requestAnimationFrame(animate);
     }
 
     // --- 9. DATE PICKER MODAL POPULATION ---
