@@ -252,61 +252,44 @@
       filter: drop-shadow(-10px 20px 35px rgba(132, 204, 22, 0.55));
     }
 
-    .hand-tag {
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&display=swap');
+
+    .handwritten-note {
       position: absolute;
-      bottom: 20px;
-      left: 10px;
-      background: var(--color-card-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 0.45rem 0.75rem;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      bottom: 25px;
+      left: -20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.15rem;
       pointer-events: none;
       white-space: nowrap;
-      animation: tagWiggle 3.5s infinite ease-in-out;
+      transform: rotate(-8deg);
+      animation: handSway 4s infinite ease-in-out;
     }
 
-    @keyframes tagWiggle {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      15% { transform: translateY(-4px) rotate(-1deg); }
-      30% { transform: translateY(0) rotate(1deg); }
-      45% { transform: translateY(-2px) rotate(0deg); }
-      60% { transform: translateY(0) rotate(0deg); }
+    @keyframes handSway {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      50% { transform: rotate(-6deg) translateY(-3px); }
     }
 
-    .hand-tag-title {
-      font-size: 0.85rem;
+    .handwritten-text {
+      font-family: "Caveat", "Patrick Hand", "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
+      font-size: 1.7rem;
       font-weight: 700;
+      line-height: 1.1;
       color: var(--color-text);
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      transition: transform 0.15s ease, color 0.15s ease;
+      user-select: none;
     }
 
-    .hand-tag-sub {
-      font-size: 0.72rem;
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-
-    .hand-gauge {
-      width: 100%;
-      height: 4px;
-      background: var(--color-border);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-top: 0.25rem;
-    }
-
-    .hand-gauge-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #84cc16, #f59e0b, #ef4444);
-      transition: width 0.05s ease;
+    .handwritten-doodle {
+      width: 105px;
+      height: 14px;
+      color: var(--color-text);
+      opacity: 0.75;
+      margin-top: -2px;
     }
 
     /* Hero Section */
@@ -1124,22 +1107,18 @@
         right: -15px;
       }
 
-      .hand-img {
-        width: 155px;
+      .handwritten-note {
+        bottom: 15px;
+        left: -15px;
       }
 
-      .hand-tag {
-        bottom: 10px;
-        left: 5px;
-        padding: 0.35rem 0.55rem;
+      .handwritten-text {
+        font-size: 1.35rem;
       }
 
-      .hand-tag-title {
-        font-size: 0.75rem;
-      }
-
-      .hand-tag-sub {
-        font-size: 0.65rem;
+      .handwritten-doodle {
+        width: 80px;
+        height: 12px;
       }
 
       .toolbar {
@@ -1243,12 +1222,11 @@
   <div class="fixed-corner-hand" id="pullFingerWidget" title="Grab and pull the finger down!">
     <div class="hand-container" id="handWrapper">
       <img src="hand.png" alt="Pull My Finger" class="hand-img" id="handImg" draggable="false" />
-      <div class="hand-tag" id="handTag">
-        <span class="hand-tag-title">Pull My Finger 💨</span>
-        <span class="hand-tag-sub" id="fingerPrompt">Grab & pull down</span>
-        <div class="hand-gauge">
-          <div class="hand-gauge-fill" id="fingerGaugeFill"></div>
-        </div>
+      <div class="handwritten-note" id="handTag">
+        <div class="handwritten-text" id="fingerPrompt">pull my finger 💨</div>
+        <svg class="handwritten-doodle" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M 5 12 Q 30 3, 60 12 T 115 10" />
+        </svg>
       </div>
     </div>
   </div>
@@ -2219,7 +2197,7 @@
 
         const threshold = getDragThreshold();
         const progress = Math.min(dragDistance / threshold, 1.0);
-        fingerGaugeFill.style.width = `${progress * 100}%`;
+        if (fingerGaugeFill) fingerGaugeFill.style.width = `${progress * 100}%`;
 
         // Elastic translation and scale stretch
         const transX = dx * 0.45;
@@ -2228,14 +2206,14 @@
         const stretchX = 1 + progress * 0.1;
         wrapper.style.transform = `translate(${transX}px, ${transY}px) scale(${stretchX}, ${stretchY})`;
 
-        if (progress < 0.3) {
-          fingerPrompt.textContent = "Pull harder... 💨";
-        } else if (progress < 0.65) {
-          fingerPrompt.textContent = "Keep pulling! Almost there... 💨";
+        if (progress < 0.35) {
+          fingerPrompt.textContent = "pull harder...";
+        } else if (progress < 0.7) {
+          fingerPrompt.textContent = "keep pulling... 💨";
         } else if (progress < 0.95) {
-          fingerPrompt.textContent = "Uh oh... don't let go! 💨";
+          fingerPrompt.textContent = "almost there...";
         } else {
-          fingerPrompt.textContent = "💥 RELEASE FOR VAULT!";
+          fingerPrompt.textContent = "💥 release for vault!";
         }
 
         if (dragDistance >= threshold) {
@@ -2256,8 +2234,8 @@
           if (tag) tag.style.animation = '';
         }, 350);
 
-        fingerGaugeFill.style.width = '0%';
-        fingerPrompt.textContent = "Grab & pull down";
+        if (fingerGaugeFill) fingerGaugeFill.style.width = '0%';
+        fingerPrompt.textContent = "pull my finger 💨";
         sounds.playPop();
       };
 
@@ -2273,8 +2251,8 @@
         setTimeout(() => { handWrapper.style.transition = ''; }, 350);
       }
       if (handTag) handTag.style.animation = '';
-      fingerGaugeFill.style.width = '0%';
-      fingerPrompt.textContent = "💨 PFFFFT!";
+      if (fingerGaugeFill) fingerGaugeFill.style.width = '0%';
+      fingerPrompt.textContent = "💨 pffffft!";
 
       // 1. Play Authentic Synthesized Fart Audio
       sounds.playFart();
@@ -2283,7 +2261,7 @@
       fartOverlay.classList.add('active');
       runFartCloudAnimation(() => {
         fartOverlay.classList.remove('active');
-        fingerPrompt.textContent = "Grab & pull down";
+        fingerPrompt.textContent = "pull my finger 💨";
         openVaultView();
         showToast("💨 Airing out the room... Welcome to the Vault!");
       });
