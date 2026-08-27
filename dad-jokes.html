@@ -1577,7 +1577,53 @@
     // --- 1. DATASET OF 366 DAILY DAD JOKES ---
     /* DEFAULT_JOKES loaded from dad-jokes-data.js */
     const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    const CATEGORY_NAMES = {
+      all: "All Categories",
+      classic: "Classic Groaners",
+      animals: "Animal Kingdom",
+      food: "Food & Kitchen",
+      tech: "Tech & Geeks",
+      science: "Science & Space",
+      work: "Tools & Work",
+      wordplay: "Puns & Wordplay",
+      family: "Dad Life & Home",
+      sports: "Sports & Outdoors",
+      music: "Music & Arts",
+      medical: "Health & Doctors",
+      holidays: "Holidays & Seasons"
+    };
+
+    function getCategoryName(categorySlug) {
+      return CATEGORY_NAMES[categorySlug] || categorySlug || "Dad Joke";
+    }
+
+    function getDayOfYear(month, day) {
+      if (month === undefined || day === undefined) return 1;
+      let dayCount = 0;
+      for (let m = 0; m < month; m++) {
+        dayCount += DAYS_IN_MONTH[m];
+      }
+      return dayCount + day;
+    }
+
+    function getJokeShortDate(joke) {
+      if (joke.shortDate) return joke.shortDate;
+      if (joke.month !== undefined && joke.day !== undefined) {
+        return `${SHORT_MONTH_NAMES[joke.month]} ${joke.day}`;
+      }
+      return joke.dateStr || "Daily Joke";
+    }
+
+    function getJokeFullDate(joke) {
+      if (joke.dateStr) return joke.dateStr;
+      if (joke.month !== undefined && joke.day !== undefined) {
+        return `${MONTH_NAMES[joke.month]} ${joke.day}`;
+      }
+      return "Daily Dad Joke";
+    }
 
     // --- 2. PROCEDURAL WEB AUDIO SYNTHESIZER ---
     class SoundEngine {
@@ -1892,12 +1938,15 @@
 
       const today = getTodayMonthAndDay();
       const isToday = (joke.month === today.month && joke.day === today.day);
+      const shortDate = getJokeShortDate(joke);
+      const dayNum = joke.dayOfYear || getDayOfYear(joke.month, joke.day);
 
-      cardDateBadge.textContent = `📅 ${joke.shortDate || joke.dateStr} · Day ${joke.dayOfYear || index + 1}`;
+      cardDateBadge.textContent = `📅 ${shortDate} · Day ${dayNum}`;
       todayMarker.style.display = isToday ? 'inline-block' : 'none';
 
-      cardCategoryTag.textContent = joke.categoryName || joke.category || "Dad Joke";
-      cardBackCategoryTag.textContent = joke.categoryName || joke.category || "Dad Joke";
+      const catName = joke.categoryName || getCategoryName(joke.category);
+      cardCategoryTag.textContent = catName;
+      cardBackCategoryTag.textContent = catName;
 
       cardTopicTitle.textContent = joke.title || "Dad Groaner";
       cardJokeSetup.textContent = joke.setup;
@@ -2014,11 +2063,12 @@
     function copyCurrentJoke() {
       if (!filteredJokes[currentIndex]) return;
       const j = filteredJokes[currentIndex];
+      const dateStr = getJokeFullDate(j);
       const text = `${j.setup}
 
 ... ${j.punchline}
 
-(Daily Dad Joke - ${j.dateStr})`;
+(Daily Dad Joke - ${dateStr})`;
       navigator.clipboard.writeText(text).then(() => {
         sounds.playChime();
         showToast("Joke copied to clipboard! 📋");
@@ -2052,11 +2102,14 @@
         let matchCat = (catFilter === 'all') || (j.category === catFilter);
         if (catFilter === 'favorites') matchCat = favorites.has(j.id);
 
+        const shortD = getJokeShortDate(j).toLowerCase();
+        const fullD = getJokeFullDate(j).toLowerCase();
         const matchSearch = !search ||
           j.setup.toLowerCase().includes(search) ||
           j.punchline.toLowerCase().includes(search) ||
           (j.title && j.title.toLowerCase().includes(search)) ||
-          (j.dateStr && j.dateStr.toLowerCase().includes(search));
+          shortD.includes(search) ||
+          fullD.includes(search);
 
         return matchCat && matchSearch;
       });
@@ -2075,11 +2128,14 @@
         const card = document.createElement('div');
         card.className = 'vault-card';
         const isFav = favorites.has(j.id);
+        const shortDate = getJokeShortDate(j);
+        const dayNum = j.dayOfYear || getDayOfYear(j.month, j.day);
+        const catName = j.categoryName || getCategoryName(j.category);
 
         card.innerHTML = `
           <div class="vault-card-header">
-            <span class="vault-card-date">📅 ${j.shortDate || j.dateStr} · Day ${j.dayOfYear || '-'}</span>
-            <span class="card-category-tag">${j.categoryName || j.category}</span>
+            <span class="vault-card-date">📅 ${shortDate} · Day ${dayNum}</span>
+            <span class="card-category-tag">${catName}</span>
           </div>
           <div class="vault-card-setup">${j.setup}</div>
           <div class="vault-card-punchline ${allPunchlinesVisible ? 'revealed' : ''}" id="punch_${j.id}">${j.punchline}</div>
@@ -2100,11 +2156,11 @@
       // Vault Event Listeners
       vaultGrid.querySelectorAll('.toggle-punch-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const id = e.target.dataset.id;
+          const id = e.currentTarget.dataset.id;
           const p = document.getElementById(`punch_${id}`);
           if (p) {
             p.classList.toggle('revealed');
-            e.target.textContent = p.classList.contains('revealed') ? 'Hide Punchline' : 'Reveal Punchline 🥁';
+            e.currentTarget.textContent = p.classList.contains('revealed') ? 'Hide Punchline' : 'Reveal Punchline 🥁';
             sounds.playPop();
           }
         });
@@ -2112,8 +2168,8 @@
 
       vaultGrid.querySelectorAll('.jump-card-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const id = parseInt(e.target.dataset.id);
-          const foundIdx = allJokes.findIndex(j => j.id === id);
+          const id = e.currentTarget.dataset.id;
+          const foundIdx = allJokes.findIndex(j => String(j.id) === String(id));
           if (foundIdx !== -1) {
             currentCategoryFilter = 'all';
             currentModeFilter = 'all';
@@ -2130,14 +2186,15 @@
 
       vaultGrid.querySelectorAll('.copy-vault-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const id = parseInt(e.target.dataset.id);
-          const j = allJokes.find(item => item.id === id);
+          const id = e.currentTarget.dataset.id;
+          const j = allJokes.find(item => String(item.id) === String(id));
           if (j) {
+            const dateStr = getJokeFullDate(j);
             navigator.clipboard.writeText(`${j.setup}
 
 ... ${j.punchline}
 
-(Daily Dad Joke - ${j.dateStr})`);
+(Daily Dad Joke - ${dateStr})`);
             sounds.playChime();
             showToast("Joke copied to clipboard! 📋");
           }
@@ -2146,7 +2203,7 @@
 
       vaultGrid.querySelectorAll('.star-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const id = parseInt(e.target.dataset.id);
+          const id = e.currentTarget.dataset.id;
           if (favorites.has(id)) {
             favorites.delete(id);
             btn.classList.remove('starred');
