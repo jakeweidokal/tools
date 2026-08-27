@@ -504,14 +504,6 @@
       border-radius: var(--radius-sm);
     }
 
-    .groan-rating {
-      font-size: 0.8rem;
-      color: var(--color-cheese);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.15rem;
-    }
-
     .star-btn {
       background: none;
       border: none;
@@ -595,20 +587,6 @@
       color: var(--color-text);
       border-left: 4px solid #f97316;
       padding-left: 1rem;
-    }
-
-    .card-commentary {
-      background: var(--color-background-alt);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 0.95rem;
-      font-size: 0.88rem;
-      line-height: 1.45;
-      color: var(--color-text-light);
-      font-style: italic;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
     }
 
     .reaction-bar {
@@ -1337,7 +1315,6 @@
             <select id="filterModeSelect" class="filter-select" aria-label="Filter mode">
               <option value="all">📅 All Days</option>
               <option value="favorites">⭐ Starred Only</option>
-              <option value="high-groan">🧀 Top Groaners (4-5 Cheese)</option>
             </select>
           </div>
 
@@ -1362,7 +1339,6 @@
                   <span class="card-category-tag" id="cardCategoryTag">New Year's Day</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span class="groan-rating" id="cardGroanRating">🧀🧀🧀🧀</span>
                   <button class="star-btn" id="starCardBtn" title="Star this joke" aria-label="Star this joke">⭐</button>
                 </div>
               </div>
@@ -1388,17 +1364,12 @@
                   <span class="card-category-tag" id="cardBackCategoryTag">New Year's Day</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <span class="groan-rating" id="cardBackGroanRating">🧀🧀🧀🧀</span>
                   <button class="star-btn" id="starCardBackBtn" title="Star this joke" aria-label="Star this joke">⭐</button>
                 </div>
               </div>
 
               <div class="card-body-back">
                 <div class="card-joke-punchline" id="cardJokePunchline">Only 15 more to go!</div>
-                <div class="card-commentary" id="cardCommentary">
-                  <span>👉</span>
-                  <span id="cardCommentaryText">Delivery tip: Pat your stomach proudly and nod with great confidence.</span>
-                </div>
 
                 <div class="reaction-bar">
                   <button class="react-btn" id="groanReactBtn">🤦‍♂️ Groaned <span id="groanCount">0</span></button>
@@ -1551,10 +1522,6 @@
           <div class="form-group">
             <label class="form-label" for="customPunchline">Punchline (The Answer):</label>
             <textarea id="customPunchline" class="form-textarea" rows="2" placeholder="e.g. I'm going to cut you down to size!"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="customCommentary">Dad's Delivery Tip (Optional):</label>
-            <input type="text" id="customCommentary" class="form-input" placeholder="e.g. Delivery tip: Make intense eye contact and don't blink." />
           </div>
           <div class="form-group">
             <label class="form-label" for="customCategory">Category:</label>
@@ -1788,14 +1755,11 @@
     const todayMarker = document.getElementById('todayMarker');
     const cardCategoryTag = document.getElementById('cardCategoryTag');
     const cardBackCategoryTag = document.getElementById('cardBackCategoryTag');
-    const cardGroanRating = document.getElementById('cardGroanRating');
-    const cardBackGroanRating = document.getElementById('cardBackGroanRating');
     const starCardBtn = document.getElementById('starCardBtn');
     const starCardBackBtn = document.getElementById('starCardBackBtn');
     const cardTopicTitle = document.getElementById('cardTopicTitle');
     const cardJokeSetup = document.getElementById('cardJokeSetup');
     const cardJokePunchline = document.getElementById('cardJokePunchline');
-    const cardCommentaryText = document.getElementById('cardCommentaryText');
     const cardCounterSmall = document.getElementById('cardCounterSmall');
     const cardBackCounterSmall = document.getElementById('cardBackCounterSmall');
     const deckStatusText = document.getElementById('deckStatusText');
@@ -1935,15 +1899,9 @@
       cardCategoryTag.textContent = joke.categoryName || joke.category || "Dad Joke";
       cardBackCategoryTag.textContent = joke.categoryName || joke.category || "Dad Joke";
 
-      const cheeseCount = joke.groan || 4;
-      const cheeseStr = "🧀".repeat(cheeseCount);
-      cardGroanRating.textContent = cheeseStr;
-      cardBackGroanRating.textContent = cheeseStr;
-
       cardTopicTitle.textContent = joke.title || "Dad Groaner";
       cardJokeSetup.textContent = joke.setup;
       cardJokePunchline.textContent = joke.punchline;
-      cardCommentaryText.textContent = joke.commentary || "Delivery tip: Make intense eye contact and don't blink until they laugh.";
 
       cardCounterSmall.textContent = `Joke ${index + 1} / ${filteredJokes.length}`;
       cardBackCounterSmall.textContent = `Joke ${index + 1} / ${filteredJokes.length}`;
@@ -1967,8 +1925,6 @@
 
         if (currentModeFilter === 'favorites') {
           matchMode = favorites.has(j.id);
-        } else if (currentModeFilter === 'high-groan') {
-          matchMode = (j.groan >= 4);
         }
 
         return matchCat && matchMode;
@@ -2408,7 +2364,6 @@
         document.getElementById('customTitle').value = '';
         document.getElementById('customSetup').value = '';
         document.getElementById('customPunchline').value = '';
-        document.getElementById('customCommentary').value = '';
         customJokeModal.style.display = 'flex';
       });
 
@@ -2419,7 +2374,6 @@
         const title = document.getElementById('customTitle').value.trim() || "Custom Dad Groaner";
         const setup = document.getElementById('customSetup').value.trim();
         const punchline = document.getElementById('customPunchline').value.trim();
-        const commentary = document.getElementById('customCommentary').value.trim() || "Delivery tip: Wink broadly and do finger guns.";
         const category = document.getElementById('customCategory').value;
 
         if (!setup || !punchline) {
@@ -2438,9 +2392,7 @@
           categoryName: "Custom User Joke",
           title: title,
           setup: setup,
-          punchline: punchline,
-          commentary: commentary,
-          groan: 5
+          punchline: punchline
         };
 
         const custom = localStorage.getItem(STORAGE_KEY_CUSTOM);
