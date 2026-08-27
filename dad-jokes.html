@@ -30,7 +30,6 @@
       --color-star: #eab308;
       --color-cheese: #f59e0b;
       --color-fart-green: #84cc16;
-      --color-fart-cloud: rgba(132, 204, 22, 0.25);
       --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
       --font-family-serif: "Charter", "Bitstream Charter", "Sitka Text", "Cambria", Georgia, serif;
       --container-width: 46rem;
@@ -125,17 +124,6 @@
       overflow-x: hidden;
     }
 
-    body.screen-shake {
-      animation: screenRumble 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    }
-
-    @keyframes screenRumble {
-      10%, 90% { transform: translate3d(-2px, -2px, 0) rotate(-0.5deg); }
-      20%, 80% { transform: translate3d(3px, 2px, 0) rotate(0.5deg); }
-      30%, 50%, 70% { transform: translate3d(-4px, -3px, 0) rotate(-1deg); }
-      40%, 60% { transform: translate3d(4px, 3px, 0) rotate(1deg); }
-    }
-
     .container {
       max-width: var(--container-width);
       width: 100%;
@@ -221,21 +209,112 @@
       color: var(--color-link-hover);
     }
 
-    /* Top Row: Title + Pull My Finger Widget */
-    .hero-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      flex-wrap: wrap;
+    /* Fixed Top-Right Pull My Finger Hand Widget */
+    .fixed-corner-hand {
+      position: fixed;
+      top: -20px;
+      right: -20px;
+      z-index: 800;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
     }
 
+    .fixed-corner-hand.grabbing {
+      cursor: grabbing;
+    }
+
+    .hand-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform-origin: 85% 15%;
+      transition: transform 0.12s ease;
+    }
+
+    .hand-img {
+      width: 220px;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      transform: rotate(-105deg);
+      transform-origin: 75% 25%;
+      filter: drop-shadow(-6px 12px 20px rgba(0, 0, 0, 0.35));
+      transition: filter 0.2s ease;
+    }
+
+    .fixed-corner-hand:hover .hand-img {
+      filter: drop-shadow(-8px 16px 28px rgba(0, 0, 0, 0.45));
+    }
+
+    .fixed-corner-hand.grabbing .hand-img {
+      filter: drop-shadow(-10px 20px 35px rgba(132, 204, 22, 0.55));
+    }
+
+    .hand-tag {
+      position: absolute;
+      bottom: 20px;
+      left: 10px;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0.45rem 0.75rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: tagWiggle 3.5s infinite ease-in-out;
+    }
+
+    @keyframes tagWiggle {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      15% { transform: translateY(-4px) rotate(-1deg); }
+      30% { transform: translateY(0) rotate(1deg); }
+      45% { transform: translateY(-2px) rotate(0deg); }
+      60% { transform: translateY(0) rotate(0deg); }
+    }
+
+    .hand-tag-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .hand-tag-sub {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .hand-gauge {
+      width: 100%;
+      height: 4px;
+      background: var(--color-border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .hand-gauge-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #84cc16, #f59e0b, #ef4444);
+      transition: width 0.05s ease;
+    }
+
+    /* Hero Section */
     .intro-section {
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
-      flex: 1;
-      min-width: 260px;
+      max-width: 34rem;
     }
 
     h1 {
@@ -258,98 +337,6 @@
       font-size: 0.95rem;
       color: var(--color-text-muted);
       line-height: 1.5;
-    }
-
-    /* Pull My Finger Interactive Component */
-    .pull-finger-widget {
-      position: relative;
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--color-background-alt);
-      border: 1px dashed var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: 0.6rem 0.9rem;
-      cursor: grab;
-      user-select: none;
-      touch-action: none;
-      transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .pull-finger-widget:hover {
-      border-color: var(--color-text-muted);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    .pull-finger-widget.grabbing {
-      cursor: grabbing;
-      border-color: #84cc16;
-      box-shadow: 0 0 16px rgba(132, 204, 22, 0.35);
-    }
-
-    .finger-content {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .finger-icon-wrap {
-      font-size: 2rem;
-      line-height: 1;
-      display: inline-block;
-      transform-origin: left center;
-      transition: transform 0.1s ease;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-    }
-
-    .finger-wiggle {
-      animation: fingerWiggle 2.5s infinite ease-in-out;
-    }
-
-    @keyframes fingerWiggle {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      15% { transform: rotate(-8deg) scale(1.08); }
-      30% { transform: rotate(6deg) scale(1.05); }
-      45% { transform: rotate(-4deg) scale(1.02); }
-      60% { transform: rotate(0deg) scale(1); }
-    }
-
-    .finger-text-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .finger-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--color-text);
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .finger-prompt {
-      font-size: 0.72rem;
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-
-    .finger-gauge {
-      width: 100%;
-      height: 4px;
-      background: var(--color-border);
-      border-radius: 999px;
-      margin-top: 0.35rem;
-      overflow: hidden;
-    }
-
-    .finger-gauge-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #f59e0b, #ef4444);
-      transition: width 0.08s ease;
     }
 
     /* Toolbar Controls */
@@ -423,24 +410,8 @@
       border-color: var(--color-text-muted);
     }
 
-    .action-btn.active {
-      background: var(--color-text);
-      color: var(--color-background);
-      border-color: var(--color-text);
-    }
-
     .action-btn.icon-only {
       padding: 0.4rem 0.55rem;
-    }
-
-    .badge-pill {
-      background: var(--color-tag-bg);
-      color: var(--color-tag-text);
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 0.1rem 0.4rem;
-      border-radius: 999px;
-      margin-left: 0.2rem;
     }
 
     /* 3D Card Stage */
@@ -1148,15 +1119,27 @@
         font-size: 1.5rem;
       }
 
-      .hero-row {
-        flex-direction: column;
-        align-items: stretch;
+      .fixed-corner-hand {
+        top: -15px;
+        right: -15px;
       }
 
-      .pull-finger-widget {
-        align-self: flex-start;
-        width: 100%;
-        justify-content: center;
+      .hand-img {
+        width: 155px;
+      }
+
+      .hand-tag {
+        bottom: 10px;
+        left: 5px;
+        padding: 0.35rem 0.55rem;
+      }
+
+      .hand-tag-title {
+        font-size: 0.75rem;
+      }
+
+      .hand-tag-sub {
+        font-size: 0.65rem;
       }
 
       .toolbar {
@@ -1256,6 +1239,20 @@
 </head>
 
 <body>
+  <!-- Fixed Top-Right Pull My Finger Hand Widget (Michelangelo Hand) -->
+  <div class="fixed-corner-hand" id="pullFingerWidget" title="Grab and pull the finger down!">
+    <div class="hand-container" id="handWrapper">
+      <img src="hand.png" alt="Pull My Finger" class="hand-img" id="handImg" draggable="false" />
+      <div class="hand-tag" id="handTag">
+        <span class="hand-tag-title">Pull My Finger 💨</span>
+        <span class="hand-tag-sub" id="fingerPrompt">Grab & pull down</span>
+        <div class="hand-gauge">
+          <div class="hand-gauge-fill" id="fingerGaugeFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <header class="site-header">
       <div class="header-container">
@@ -1279,26 +1276,10 @@
     </header>
 
     <main style="display: flex; flex-direction: column; gap: 1.5rem; flex: 1;">
-      <!-- Hero Top Row: Title + Pull My Finger Widget -->
-      <section class="hero-row">
-        <div class="intro-section">
-          <h1><span class="h1-emoji">🧔‍♂️</span> Daily Dad Jokes</h1>
-          <p class="subtitle">A fresh, handcrafted groan-worthy dad joke for every single day of the year (366 days). Setup on front, punchline on back.</p>
-        </div>
-
-        <!-- Pull My Finger Interactive Component -->
-        <div class="pull-finger-widget" id="pullFingerWidget" title="Grab and pull the finger or click it for a gas-powered surprise!">
-          <div class="finger-content">
-            <div class="finger-icon-wrap finger-wiggle" id="fingerIcon">👉</div>
-            <div class="finger-text-block">
-              <span class="finger-title">Pull My Finger 💨</span>
-              <span class="finger-prompt" id="fingerPrompt">Drag or click for all jokes</span>
-            </div>
-          </div>
-          <div class="finger-gauge">
-            <div class="finger-gauge-fill" id="fingerGaugeFill"></div>
-          </div>
-        </div>
+      <!-- Hero Row -->
+      <section class="intro-section">
+        <h1><span class="h1-emoji">🧔‍♂️</span> Daily Dad Jokes</h1>
+        <p class="subtitle">A fresh, handcrafted groan-worthy dad joke for every single day of the year (366 days). Setup on front, punchline on back.</p>
       </section>
 
       <!-- View 1: 3D Flip Card View -->
@@ -1683,7 +1664,7 @@
         if (!this.ctx) return;
         try {
           const now = this.ctx.currentTime;
-          const duration = 0.8 + Math.random() * 0.4;
+          const duration = 0.85 + Math.random() * 0.4;
 
           // 1. FM Modulated Low Oscillator (The Flapping Rumble)
           const baseOsc = this.ctx.createOscillator();
@@ -1692,8 +1673,8 @@
           const mainGain = this.ctx.createGain();
           const filter = this.ctx.createBiquadFilter();
 
-          const startPitch = 85 + Math.random() * 35;
-          const endPitch = 45 + Math.random() * 20;
+          const startPitch = 90 + Math.random() * 35;
+          const endPitch = 42 + Math.random() * 20;
 
           baseOsc.type = 'sawtooth';
           baseOsc.frequency.setValueAtTime(startPitch, now);
@@ -1710,11 +1691,11 @@
 
           // Resonant Low-pass Filter for acoustic body
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(400, now);
-          filter.frequency.exponentialRampToValueAtTime(120, now + duration);
-          filter.Q.setValueAtTime(4, now);
+          filter.frequency.setValueAtTime(420, now);
+          filter.frequency.exponentialRampToValueAtTime(110, now + duration);
+          filter.Q.setValueAtTime(4.5, now);
 
-          mainGain.gain.setValueAtTime(0.25, now);
+          mainGain.gain.setValueAtTime(0.28, now);
           mainGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
           baseOsc.connect(filter);
@@ -1734,11 +1715,11 @@
 
           const noiseFilter = this.ctx.createBiquadFilter();
           noiseFilter.type = 'bandpass';
-          noiseFilter.frequency.setValueAtTime(260, now);
+          noiseFilter.frequency.setValueAtTime(280, now);
           noiseFilter.Q.setValueAtTime(2.5, now);
 
           const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.18, now);
+          noiseGain.gain.setValueAtTime(0.2, now);
           noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
           whiteNoise.connect(noiseFilter);
@@ -1772,7 +1753,7 @@
     let filteredJokes = [];
     let currentIndex = 0;
     let favorites = new Set();
-    let reactions = {}; // { id: { groans: 0, chuckles: 0, userGroaned: bool, userChuckled: bool } }
+    let reactions = {};
 
     let currentCategoryFilter = 'all';
     let currentModeFilter = 'all';
@@ -1843,9 +1824,10 @@
 
     const toast = document.getElementById('toast');
 
-    // Pull My Finger Elements
+    // Pull My Finger Elements (Top-Right Corner Hand)
     const pullFingerWidget = document.getElementById('pullFingerWidget');
-    const fingerIcon = document.getElementById('fingerIcon');
+    const handWrapper = document.getElementById('handWrapper');
+    const handTag = document.getElementById('handTag');
     const fingerPrompt = document.getElementById('fingerPrompt');
     const fingerGaugeFill = document.getElementById('fingerGaugeFill');
     const fartOverlay = document.getElementById('fartOverlay');
@@ -2208,10 +2190,15 @@
     let dragStartX = 0;
     let dragStartY = 0;
     let dragDistance = 0;
-    const DRAG_THRESHOLD = 45;
+
+    function getDragThreshold() {
+      return window.innerWidth < 640 ? 100 : 140;
+    }
 
     function initPullFinger() {
       const widget = pullFingerWidget;
+      const wrapper = handWrapper;
+      const tag = handTag;
 
       widget.addEventListener('pointerdown', (e) => {
         isDraggingFinger = true;
@@ -2219,7 +2206,7 @@
         dragStartY = e.clientY;
         dragDistance = 0;
         widget.classList.add('grabbing');
-        fingerIcon.classList.remove('finger-wiggle');
+        if (tag) tag.style.animation = 'none';
         widget.setPointerCapture(e.pointerId);
         sounds.playPop();
       });
@@ -2230,27 +2217,30 @@
         const dy = e.clientY - dragStartY;
         dragDistance = Math.hypot(dx, dy);
 
-        const progress = Math.min(dragDistance / DRAG_THRESHOLD, 1.2);
-        fingerGaugeFill.style.width = `${Math.min(progress * 100, 100)}%`;
+        const threshold = getDragThreshold();
+        const progress = Math.min(dragDistance / threshold, 1.0);
+        fingerGaugeFill.style.width = `${progress * 100}%`;
 
-        // Stretch and rotate finger
-        const stretchX = 1 + progress * 0.4;
-        const stretchY = 1 - progress * 0.15;
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI) * 0.3;
-        fingerIcon.style.transform = `scale(${stretchX}, ${stretchY}) rotate(${angle}deg) translateX(${dx * 0.2}px)`;
+        // Elastic translation and scale stretch
+        const transX = dx * 0.45;
+        const transY = dy * 0.45;
+        const stretchY = 1 + progress * 0.25;
+        const stretchX = 1 + progress * 0.1;
+        wrapper.style.transform = `translate(${transX}px, ${transY}px) scale(${stretchX}, ${stretchY})`;
 
-        if (progress < 0.35) {
-          fingerPrompt.textContent = "Tug a little harder...";
-        } else if (progress < 0.75) {
-          fingerPrompt.textContent = "Keep pulling...";
-        } else if (progress < 1.0) {
-          fingerPrompt.textContent = "Uh oh... brace yourself!";
+        if (progress < 0.3) {
+          fingerPrompt.textContent = "Pull harder... 💨";
+        } else if (progress < 0.65) {
+          fingerPrompt.textContent = "Keep pulling! Almost there... 💨";
+        } else if (progress < 0.95) {
+          fingerPrompt.textContent = "Uh oh... don't let go! 💨";
         } else {
-          fingerPrompt.textContent = "💥 POOF!";
+          fingerPrompt.textContent = "💥 RELEASE FOR VAULT!";
         }
 
-        if (dragDistance >= DRAG_THRESHOLD) {
+        if (dragDistance >= threshold) {
           isDraggingFinger = false;
+          try { widget.releasePointerCapture(e.pointerId); } catch(err) {}
           triggerFartExplosion();
         }
       });
@@ -2259,15 +2249,16 @@
         if (!isDraggingFinger) return;
         isDraggingFinger = false;
         widget.classList.remove('grabbing');
-        fingerIcon.style.transform = 'none';
-        fingerGaugeFill.style.width = '0%';
-        fingerPrompt.textContent = "Drag or click for all jokes";
-        fingerIcon.classList.add('finger-wiggle');
+        wrapper.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        wrapper.style.transform = 'none';
+        setTimeout(() => {
+          wrapper.style.transition = '';
+          if (tag) tag.style.animation = '';
+        }, 350);
 
-        // If clicked with minimal drag, still trigger!
-        if (dragDistance < 10) {
-          triggerFartExplosion();
-        }
+        fingerGaugeFill.style.width = '0%';
+        fingerPrompt.textContent = "Grab & pull down";
+        sounds.playPop();
       };
 
       widget.addEventListener('pointerup', endDrag);
@@ -2276,23 +2267,23 @@
 
     function triggerFartExplosion() {
       pullFingerWidget.classList.remove('grabbing');
-      fingerIcon.style.transform = 'none';
+      if (handWrapper) {
+        handWrapper.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        handWrapper.style.transform = 'none';
+        setTimeout(() => { handWrapper.style.transition = ''; }, 350);
+      }
+      if (handTag) handTag.style.animation = '';
       fingerGaugeFill.style.width = '0%';
       fingerPrompt.textContent = "💨 PFFFFT!";
-      fingerIcon.classList.add('finger-wiggle');
 
       // 1. Play Authentic Synthesized Fart Audio
       sounds.playFart();
 
-      // 2. Comical Screen Shake Rumble
-      document.body.classList.add('screen-shake');
-      setTimeout(() => document.body.classList.remove('screen-shake'), 600);
-
-      // 3. Fart Cloud Canvas Particle Simulation
+      // 2. Fart Cloud Canvas Particle Simulation (No Screen Shake)
       fartOverlay.classList.add('active');
       runFartCloudAnimation(() => {
         fartOverlay.classList.remove('active');
-        fingerPrompt.textContent = "Drag or click for all jokes";
+        fingerPrompt.textContent = "Grab & pull down";
         openVaultView();
         showToast("💨 Airing out the room... Welcome to the Vault!");
       });
@@ -2304,29 +2295,29 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      // Calculate origin near the top-right finger widget
+      // Calculate origin near the top-right hand widget
       const rect = pullFingerWidget.getBoundingClientRect();
       const originX = rect.left + rect.width / 2;
       const originY = rect.top + rect.height / 2;
 
       const particles = [];
-      const particleCount = 140;
+      const particleCount = 150;
       const colors = ['#84cc16', '#a3e635', '#eab308', '#ca8a04', '#65a30d', '#facc15'];
       const emojis = ['💨', '🤢', '🧀', '🎺', '💥', '👃', '🦨', '⚡'];
 
       for (let i = 0; i < particleCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = 3 + Math.random() * 12;
+        const speed = 3.5 + Math.random() * 13;
         particles.push({
           x: originX,
           y: originY,
           vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 4,
           vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 4,
-          radius: 18 + Math.random() * 45,
+          radius: 18 + Math.random() * 50,
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 0.85,
           growth: 1.02 + Math.random() * 0.03,
-          emoji: Math.random() > 0.7 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
+          emoji: Math.random() > 0.68 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
           rotation: Math.random() * Math.PI * 2,
           rotSpeed: (Math.random() - 0.5) * 0.1
         });
